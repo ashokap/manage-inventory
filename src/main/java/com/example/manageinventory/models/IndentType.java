@@ -2,5 +2,7 @@ package com.example.manageinventory.models;
 
 public enum IndentType {
     INCOMING,
-    OUTGOING
+    OUTGOING,
+    RETURN_OUTGOING,
+    RETURN_INCOMING
 }

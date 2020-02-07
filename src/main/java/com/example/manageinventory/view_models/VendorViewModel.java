@@ -1,36 +1,23 @@
-package com.example.manageinventory.models;
+package com.example.manageinventory.view_models;
+
+import com.example.manageinventory.models.VendorType;
 
 import javax.persistence.*;
-import java.util.List;
 
-/**
- * Created by pana on 24/01/20.
- */
-@Entity(name = "manufacturer")
-public class Manufacturer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column(name = "name")
+public class VendorViewModel {
+    private Long id;
     private String name;
-    @Column(name = "address1")
     private String address1;
-    @Column(name = "address2")
     private String address2;
-    @Column(name = "address3")
     private String address3;
-    @OneToMany(mappedBy = "manufacturer")
-    private List<Product> productList;
+    private String type;
+    private String gstNumber;
 
-
-    public Manufacturer() {
-    }
-
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -66,11 +53,19 @@ public class Manufacturer {
         this.address3 = address3;
     }
 
-    public List<Product> getProductList() {
-        return productList;
+    public String getType() {
+        return type;
     }
 
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getGstNumber() {
+        return gstNumber;
+    }
+
+    public void setGstNumber(String gstNumber) {
+        this.gstNumber = gstNumber;
     }
 }

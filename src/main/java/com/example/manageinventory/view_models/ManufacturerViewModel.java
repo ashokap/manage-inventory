@@ -1,4 +1,4 @@
-package com.example.manageinventory.models;
+package com.example.manageinventory.view_models;
 
 import javax.persistence.*;
 import java.util.List;
@@ -6,31 +6,25 @@ import java.util.List;
 /**
  * Created by pana on 24/01/20.
  */
-@Entity(name = "manufacturer")
-public class Manufacturer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column(name = "name")
+
+public class ManufacturerViewModel {
+    private Long id;
+
     private String name;
-    @Column(name = "address1")
+
     private String address1;
-    @Column(name = "address2")
+
     private String address2;
-    @Column(name = "address3")
+
     private String address3;
-    @OneToMany(mappedBy = "manufacturer")
-    private List<Product> productList;
 
+    private List<Long> productList;
 
-    public Manufacturer() {
-    }
-
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -66,11 +60,11 @@ public class Manufacturer {
         this.address3 = address3;
     }
 
-    public List<Product> getProductList() {
+    public List<Long> getProductList() {
         return productList;
     }
 
-    public void setProductList(List<Product> productList) {
+    public void setProductList(List<Long> productList) {
         this.productList = productList;
     }
 }

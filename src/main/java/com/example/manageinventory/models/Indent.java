@@ -1,12 +1,12 @@
 package com.example.manageinventory.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import org.hibernate.annotations.GeneratorType;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by pana on 24/01/20.
@@ -18,21 +18,26 @@ public class Indent {
     private int id;
     @Column(name = "type")
     private IndentType type;
+    @Column(name = "remarks")
+    private String remarks;
+    @Column(name = "status")
+    private IndentStatus status;
 
     @OneToMany(mappedBy = "indent")
-    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
-    Set<IndentLine> indentLineList;
-
-    private Date indentDate;
+    List<IndentLine> indentLineList;
+    @Column(name = "delivery_date")
+    private Date deliveryDate;
     @OneToOne
+    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JoinColumn(name = "user_id")
     private User raisedBy;
     @Column(name = "total_price")
     private double totalPrice;
+
     @OneToOne
+    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JoinColumn(name = "location_id")
     private Location location;
-
 
     public Indent() {
     }
@@ -53,20 +58,20 @@ public class Indent {
         this.type = type;
     }
 
-    public Set<IndentLine> getIndentLineList() {
+    public List<IndentLine> getIndentLineList() {
         return indentLineList;
     }
 
-    public void setIndentLineList(Set<IndentLine> indentLineList) {
+    public void setIndentLineList(List<IndentLine> indentLineList) {
         this.indentLineList = indentLineList;
     }
 
-    public Date getIndentDate() {
-        return indentDate;
+    public Date getDeliveryDate() {
+        return deliveryDate;
     }
 
-    public void setIndentDate(Date indentDate) {
-        this.indentDate = indentDate;
+    public void setDeliveryDate(Date deliveryDate) {
+        this.deliveryDate = deliveryDate;
     }
 
     public User getRaisedBy() {
@@ -85,11 +90,5 @@ public class Indent {
         this.totalPrice = totalPrice;
     }
 
-    public Location getLocation() {
-        return location;
-    }
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
 }

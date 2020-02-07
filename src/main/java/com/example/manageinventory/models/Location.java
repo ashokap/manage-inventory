@@ -1,6 +1,7 @@
 package com.example.manageinventory.models;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by pana on 24/01/20.
@@ -9,7 +10,7 @@ import javax.persistence.*;
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
     @Column(name = "shelf_number")
     private String shelfNumber;
     @Column(name = "rack_number")
@@ -17,14 +18,22 @@ public class Location {
     @Column(name = "room_number")
     private String roomNumber;
 
+    @ManyToMany
+    @JoinTable(
+            name = "location_product",
+            joinColumns = @JoinColumn(name = "location_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private List<Product> products;
+
     public Location() {
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -50,5 +59,13 @@ public class Location {
 
     public void setRoomNumber(String roomNumber) {
         this.roomNumber = roomNumber;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 }

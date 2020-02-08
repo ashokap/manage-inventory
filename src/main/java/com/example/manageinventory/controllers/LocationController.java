@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.GeneratedValue;
+import javax.validation.constraints.Positive;
+
 @RestController
 @RequestMapping(path = APIConstants.Location.LOCATION_ROOT)
 public class LocationController {
@@ -18,7 +21,7 @@ public class LocationController {
     private LocationService locationService;
 
     /**
-     * //Get list of products in the inventory
+     * //Get list of locations in the inventory
      * @return
      */
     @GetMapping
@@ -88,4 +91,27 @@ public class LocationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @GetMapping(path = APIConstants.Location.LOCATION_PRODUCTS)
+    public ResponseEntity getAllProductsForLocation(){
+        return null;
+    }
+
+    @GetMapping(path = APIConstants.Location.LOCATION_INDENTS)
+    public ResponseEntity getAllIndentsForLocation(){
+        return null;
+    }
+
+
+    @PostMapping(path = APIConstants.Location.LOCATION_PLACE_PRODUCTS)
+    public ResponseEntity placeProductsInLocation(@RequestParam int productId, @RequestParam int quantity){
+        return null;
+    }
+
+
+    @PostMapping(path = APIConstants.Location.LOCATION_REMOVE_PRODUCTS)
+    public ResponseEntity removeProductsFromLocation(@RequestParam int productId, @RequestParam int quantity){
+        return null;
+    }
+
 }

@@ -90,5 +90,27 @@ public class Indent {
         this.totalPrice = totalPrice;
     }
 
+    public String getRemarks() {
+        return remarks;
+    }
 
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public IndentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(IndentStatus status) {
+        this.status = status;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 }

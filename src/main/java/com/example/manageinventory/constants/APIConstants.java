@@ -34,9 +34,8 @@ public class APIConstants {
     public class Indent {
         public static final String INDENT_ROOT = ROOT_PATH+"/indents";
         public static final String INDENT_GET_UPDATE_DELETE = "/{id}";
-
         public static final String INDENT_LOCATIONS = "{id}/locations";
-
+        public static final String INDENT_RETURN_CREATE = "{id}/returns";
 
     }
 

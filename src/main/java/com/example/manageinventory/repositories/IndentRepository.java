@@ -5,4 +5,5 @@ import com.example.manageinventory.models.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IndentRepository extends JpaRepository<Indent, Integer> {
+    Indent findIndentById(int id);
 }

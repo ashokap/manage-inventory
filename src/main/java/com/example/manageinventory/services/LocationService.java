@@ -28,24 +28,42 @@ public class LocationService implements InitializingBean {
     }
 
     public ResponseEntity getLocationById(int id) {
-        return null;
+        Location location = this.locationRepository.findLocationById(id);
+
+        if(location == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Location with ID: %d not found",id));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(location);
     }
 
     public ResponseEntity createNewLocation(LocationViewModel locationViewModel) {
 
             Location location = new Location();
 
-            BeanUtils.copyProperties(locationViewModel, location, "id","productList", "" );
+            BeanUtils.copyProperties(locationViewModel, location, "id","productList");
             location.setAvailable(true);
             locationRepository.saveAndFlush(location);
             return ResponseEntity.status(HttpStatus.CREATED).body(location);
     }
 
     public ResponseEntity updateLocationDetails(int id, LocationViewModel locationViewModel) {
-        return null;
+
+        Location location = this.locationRepository.findLocationById(id);
+        if(location == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Location with ID: %d not found",id));
+        }
+
+        BeanUtils.copyProperties(locationViewModel, location, "id","productList");
+        locationRepository.saveAndFlush(location);
+        return ResponseEntity.status(HttpStatus.CREATED).body(location);
     }
 
     public ResponseEntity updateLocationMarkAsDelete(int id) {
-        return null;
+        Location location = this.locationRepository.findLocationById(id);
+        if(location == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Location with ID: %d not found",id));
+        }
+        location.setAvailable(false);
+        return ResponseEntity.status(HttpStatus.OK).body(String.format("Location %d has been marked as Un Available", location.getId()));
     }
 }

@@ -5,7 +5,7 @@ package com.example.manageinventory.view_models;
  */
 public class IndentLineViewModel {
     private int id;
-    private String product_id;
+    private int product_id;
     private int quantity;
     private double unitPrice;
 
@@ -20,11 +20,11 @@ public class IndentLineViewModel {
         this.id = id;
     }
 
-    public String getProduct_id() {
+    public int getProduct_id() {
         return product_id;
     }
 
-    public void setProduct_id(String product_id) {
+    public void setProduct_id(int product_id) {
         this.product_id = product_id;
     }
 

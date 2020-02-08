@@ -1,8 +1,5 @@
 package com.example.manageinventory.view_models;
 
-import com.example.manageinventory.models.IndentType;
-
-import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
@@ -11,7 +8,7 @@ import java.util.List;
  */
 public class IndentViewModel {
 
-    private Long id;
+    private int id;
 
     private String type;
 
@@ -25,11 +22,11 @@ public class IndentViewModel {
 
     private Long location_id;
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

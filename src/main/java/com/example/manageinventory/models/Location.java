@@ -2,6 +2,7 @@ package com.example.manageinventory.models;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pana on 24/01/20.
@@ -11,20 +12,20 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "shelf_number")
-    private String shelfNumber;
-    @Column(name = "rack_number")
-    private String rackNumber;
-    @Column(name = "room_number")
-    private String roomNumber;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "type")
+    private String type;
+    @Column(name = "is_available")
+    private Boolean isAvailable;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "location_product",
             joinColumns = @JoinColumn(name = "location_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private List<Product> products;
+    private Set<Product> products;
 
     public Location() {
     }
@@ -37,35 +38,46 @@ public class Location {
         this.id = id;
     }
 
-    public String getShelfNumber() {
-        return shelfNumber;
+    public String getDescription() {
+        return description;
     }
 
-    public void setShelfNumber(String shelfNumber) {
-        this.shelfNumber = shelfNumber;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getRackNumber() {
-        return rackNumber;
+    public String getType() {
+        return type;
     }
 
-    public void setRackNumber(String rackNumber) {
-        this.rackNumber = rackNumber;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getRoomNumber() {
-        return roomNumber;
+    public Boolean getAvailable() {
+        return isAvailable;
     }
 
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
+    public void setAvailable(Boolean available) {
+        isAvailable = available;
     }
 
-    public List<Product> getProducts() {
+    public Set<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(Set<Product> products) {
         this.products = products;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", type='" + type + '\'' +
+                ", isAvailable=" + isAvailable +
+                ", products=" + products +
+                '}';
     }
 }

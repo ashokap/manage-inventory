@@ -1,48 +1,59 @@
 package com.example.manageinventory.view_models;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by pana on 24/01/20.
  */
 public class LocationViewModel {
-    private Long id;
+    private int id;
 
-    private String shelfNumber;
+    private String description;
 
-    private String rackNumber;
+    private String type;
 
-    private String roomNumber;
+    private Boolean isAvailable;
 
-    public Long getId() {
+    private List<Integer> productList;
+
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getShelfNumber() {
-        return shelfNumber;
+    public String getDescription() {
+        return description;
     }
 
-    public void setShelfNumber(String shelfNumber) {
-        this.shelfNumber = shelfNumber;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getRackNumber() {
-        return rackNumber;
+    public String getType() {
+        return type;
     }
 
-    public void setRackNumber(String rackNumber) {
-        this.rackNumber = rackNumber;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getRoomNumber() {
-        return roomNumber;
+    public Boolean getAvailable() {
+        return isAvailable;
     }
 
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
+    public void setAvailable(Boolean available) {
+        isAvailable = available;
+    }
+
+    public List<Integer> getProductList() {
+        return productList;
+    }
+
+    public void setProductList(List<Integer> productList) {
+        this.productList = productList;
     }
 }

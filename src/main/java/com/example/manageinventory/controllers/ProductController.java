@@ -22,9 +22,12 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    //Get list of products in the inventory
-    @GetMapping(path = APIConstants.Product.PRODUCT_LIST)
-    public ResponseEntity list() {
+    /**
+     * //Get list of products in the inventory
+     * @return
+     */
+    @GetMapping
+    public ResponseEntity listOfProducts() {
         try {
             return this.productService.getListOfProducts();
         } catch (Exception e) {
@@ -32,17 +35,28 @@ public class ProductController {
         }
     }
 
+    /**
+     * View Product details
+     * @param id
+     * @return
+     */
 
     //Get details of a product
-    @GetMapping(path = APIConstants.Product.PRODUCT_GET)
-    public ResponseEntity getBySku(
-            @PathVariable String sku) {
+    @GetMapping(path = APIConstants.Product.PRODUCT_GET_UPDATE_DELETE)
+    public ResponseEntity getProductById(
+            @PathVariable int id) {
         try {
-            return this.productService.getProductBySku(sku);
+            return this.productService.getProductById(id);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    /**
+     * Create/register a new Product. Manufacturer should be created before hand
+     * @param product
+     * @return
+     */
 
     @PostMapping(path = APIConstants.Product.PRODUCT_REGISTER)
     public ResponseEntity create(@RequestBody final ProductViewModel product) {
@@ -54,11 +68,11 @@ public class ProductController {
 
     }
 
-    @PostMapping(path = APIConstants.Product.PRODUCT_UPDATE)
+    @PutMapping(path = APIConstants.Product.PRODUCT_GET_UPDATE_DELETE)
     public ResponseEntity updateProduct(@RequestBody final ProductViewModel product,
-                                        @PathVariable String sku) {
+                                        @PathVariable int id) {
         try{
-            return this.productService.updateProductDetails(sku, product);
+            return this.productService.updateProductDetails(id, product);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -66,12 +80,60 @@ public class ProductController {
 
     }
 
-    @PostMapping(path = APIConstants.Product.PRODUCT_DELETE)
-    public ResponseEntity deleteProduct(@RequestBody final ProductViewModel product) {
-        return null;
-
+    /**
+     * API to soft delete Product.
+     * @param id
+     * @return
+     */
+    @DeleteMapping(path = APIConstants.Product.PRODUCT_GET_UPDATE_DELETE)
+    public ResponseEntity deleteProduct(@PathVariable int id) {
+        try{
+            return this.productService.updateProductMarkAsDelete(id);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
+    //Get details of a product
+    @GetMapping(path = APIConstants.Product.PRODUCT_LOCATIONS)
+    public ResponseEntity getLocationsForProduct(
+            @PathVariable int id) {
+        try {
+            return this.productService.getLocationsForProduct(id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    //Get details of a product
+    @GetMapping(path = APIConstants.Product.PRODUCT_CRITICAL_STOCK)
+    public ResponseEntity getCriticallyLowProducts() {
+        try {
+            return null;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping(path = APIConstants.Product.PRODUCT_FAST_MOVING)
+    public ResponseEntity getFastMovingProducts(
+            @RequestParam String fromDate, @RequestParam String toDate) {
+        try {
+            return null;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping(path = APIConstants.Product.PRODUCT_SLOW_MOVING)
+    public ResponseEntity getSlowMovingProducts(
+            @RequestParam String fromDate, @RequestParam String toDate) {
+        try {
+            return null;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
 
 }

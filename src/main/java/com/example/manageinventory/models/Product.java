@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pana on 24/01/20.
@@ -33,14 +34,14 @@ public class Product {
     @Column(name = "status")
     private ProductStatus status;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore //  prevent back serialization for many to many
     @JoinTable(
             name = "location_product",
             joinColumns = @JoinColumn(name = "location_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private List<Location> locations;
+    private Set<Location> locations;
 
     @ManyToOne
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
@@ -58,7 +59,7 @@ public class Product {
         this.id = id;
     }
 
-    public Product(String upcCode, String hsnCode, String name, ProductCategory category, String sku, String description, ProductStatus status, List<Location> locations, Manufacturer manufacturer) {
+    public Product(String upcCode, String hsnCode, String name, ProductCategory category, String sku, String description, ProductStatus status, Set<Location> locations, Manufacturer manufacturer) {
         this.upcCode = upcCode;
         this.hsnCode = hsnCode;
         this.name = name;
@@ -126,11 +127,11 @@ public class Product {
         this.status = status;
     }
 
-    public List<Location> getLocations() {
+    public Set<Location> getLocations() {
         return locations;
     }
 
-    public void setLocations(List<Location> locations) {
+    public void setLocations(Set<Location> locations) {
         this.locations = locations;
     }
 

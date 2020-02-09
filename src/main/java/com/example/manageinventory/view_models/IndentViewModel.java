@@ -1,6 +1,5 @@
 package com.example.manageinventory.view_models;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,13 +13,13 @@ public class IndentViewModel {
 
     List<IndentLineViewModel> indentLines;
 
-    private Date indentDate;
+    private String deliveryDate;
 
-    private Long raisedBy;
+    private int raisedBy;
 
     private double totalPrice;
 
-    private Long location_id;
+    private int location_id;
 
     public int getId() {
         return id;
@@ -46,19 +45,19 @@ public class IndentViewModel {
         this.type = type;
     }
 
-    public Date getIndentDate() {
-        return indentDate;
+    public String getDeliveryDate() {
+        return deliveryDate;
     }
 
-    public void setIndentDate(Date indentDate) {
-        this.indentDate = indentDate;
+    public void setDeliveryDate(String deliveryDate) {
+        this.deliveryDate = deliveryDate;
     }
 
-    public Long getRaisedBy() {
+    public int getRaisedBy() {
         return raisedBy;
     }
 
-    public void setRaisedBy(Long raisedBy) {
+    public void setRaisedBy(int raisedBy) {
         this.raisedBy = raisedBy;
     }
 
@@ -70,11 +69,24 @@ public class IndentViewModel {
         this.totalPrice = totalPrice;
     }
 
-    public Long getLocation_id() {
+    public int getLocation_id() {
         return location_id;
     }
 
-    public void setLocation_id(Long location_id) {
+    public void setLocation_id(int location_id) {
         this.location_id = location_id;
+    }
+
+    @Override
+    public String toString() {
+        return "IndentViewModel{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", indentLines=" + indentLines +
+                ", deliveryDate='" + deliveryDate + '\'' +
+                ", raisedBy=" + raisedBy +
+                ", totalPrice=" + totalPrice +
+                ", location_id=" + location_id +
+                '}';
     }
 }

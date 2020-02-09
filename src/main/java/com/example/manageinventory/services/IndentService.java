@@ -1,5 +1,6 @@
 package com.example.manageinventory.services;
 
+import com.example.manageinventory.constants.InventoryConstants;
 import com.example.manageinventory.models.*;
 import com.example.manageinventory.repositories.IndentRepository;
 import com.example.manageinventory.repositories.ProductRepository;
@@ -10,23 +11,30 @@ import com.example.manageinventory.view_models.LocationViewModel;
 import com.example.manageinventory.view_models.ReturnIndentViewModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Service
 public class IndentService implements InitializingBean {
+    @Autowired
+    private IndentRepository indentRepository;
+    @Autowired
+    private ReturnIndentRepository returnIndentRepository;
+    @Autowired
+    private ProductRepository productRepository;
+
     @Override
     public void afterPropertiesSet() throws Exception {
         
     }
-    
-    private IndentRepository indentRepository;
-    private ReturnIndentRepository returnIndentRepository;
-    private ProductRepository productRepository;
 
     public ResponseEntity getListOfIndents(){
         return ResponseEntity.status(HttpStatus.OK).body(this.indentRepository.findAll());
@@ -41,17 +49,26 @@ public class IndentService implements InitializingBean {
         return ResponseEntity.status(HttpStatus.OK).body(indent);
     }
 
-    public ResponseEntity createNewIndent(IndentViewModel indentViewModel) {
+    public ResponseEntity createNewIndent(IndentViewModel indentViewModel) throws ParseException {
 
         Indent indent = new Indent();
+        System.out.println(String.format("\n Indent Obj: %s, \n Indent Model: %s Before\n",indent.toString(), indentViewModel.toString() ));
+        try{
+            BeanUtils.copyProperties(indentViewModel, indent, "id","deliveryDate");
+        }catch (Exception e){
+            System.out.println("Inside Bean CopyProperties exception");
+            System.out.println(e.fillInStackTrace());
+        }
 
-        BeanUtils.copyProperties(indentViewModel, indent, "id","status");
+//        Date deliveryDate= new SimpleDateFormat(InventoryConstants.DefaultDateFormat).parse(indentViewModel.getDeliveryDate());
+//        indent.setDeliveryDate(deliveryDate);
+        System.out.println(String.format("\n Indent type: %s, Indenty type enum: %s\n",indent.getType().toString(), IndentType.INCOMING.toString() ));
         if(indent.getType().toString().equalsIgnoreCase(IndentType.INCOMING.toString())){
             indent.setStatus(IndentStatus.ORDER_RECEIVED);
         }else{
             indent.setStatus(IndentStatus.ORDER_PLACED);
         }
-
+        System.out.println(String.format("\n Indent Obj: %s, Indent Model: %s \n",indent.toString(), indentViewModel.toString() ));
         indentRepository.saveAndFlush(indent);
         return ResponseEntity.status(HttpStatus.CREATED).body(indent);
     }

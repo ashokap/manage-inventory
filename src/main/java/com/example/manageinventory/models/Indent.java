@@ -113,4 +113,19 @@ public class Indent {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    @Override
+    public String toString() {
+        return "Indent{" +
+                "id=" + id +
+                ", type=" + type +
+                ", remarks='" + remarks + '\'' +
+                ", status=" + status +
+                ", indentLineList=" + indentLineList +
+                ", deliveryDate=" + deliveryDate +
+                ", raisedBy=" + raisedBy +
+                ", totalPrice=" + totalPrice +
+                ", location=" + location +
+                '}';
+    }
 }

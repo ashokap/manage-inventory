@@ -43,4 +43,14 @@ public class IndentLineViewModel {
     public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
     }
+
+    @Override
+    public String toString() {
+        return "IndentLineViewModel{" +
+                "id=" + id +
+                ", product_id=" + product_id +
+                ", quantity=" + quantity +
+                ", unitPrice=" + unitPrice +
+                '}';
+    }
 }

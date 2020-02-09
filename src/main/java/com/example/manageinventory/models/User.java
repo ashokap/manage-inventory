@@ -101,4 +101,18 @@ public class User {
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", userCode='" + userCode + '\'' +
+                ", isActive=" + isActive +
+                ", contactNumber='" + contactNumber + '\'' +
+                ", displayName='" + displayName + '\'' +
+                '}';
+    }
 }

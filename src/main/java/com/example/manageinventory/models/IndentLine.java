@@ -26,6 +26,11 @@ public class IndentLine {
     @JoinColumn(name = "indent_id", nullable = false)
     private Indent indent;
 
+    @ManyToOne
+    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JoinColumn(name = "return_indent_id", nullable = false)
+    private ReturnIndent returnIndent;
+
     public IndentLine() {
     }
 
@@ -67,5 +72,13 @@ public class IndentLine {
 
     public void setIndent(Indent indent) {
         this.indent = indent;
+    }
+
+    public ReturnIndent getReturnIndent() {
+        return returnIndent;
+    }
+
+    public void setReturnIndent(ReturnIndent returnIndent) {
+        this.returnIndent = returnIndent;
     }
 }

@@ -11,6 +11,7 @@ import com.example.manageinventory.repositories.ProductRepository;
 import com.example.manageinventory.services.IndentService;
 import com.example.manageinventory.view_models.IndentViewModel;
 import com.example.manageinventory.view_models.LocationViewModel;
+import com.example.manageinventory.view_models.ReturnIndentViewModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -78,12 +79,20 @@ public class IndentController {
     @GetMapping(path = APIConstants.Indent.INDENT_LOCATIONS)
     public ResponseEntity getLocationsForIndent(
             @PathVariable int id) {
-        return null;
+        try{
+            return this.indentService.getLocationsForIndent(id);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
-    @GetMapping(path = APIConstants.Indent.INDENT_RETURN_CREATE)
-    public ResponseEntity createReturnForIndent(@PathVariable int id, @RequestBody IndentViewModel indentViewModel){
-        return null;
+    @PostMapping(path = APIConstants.Indent.INDENT_RETURN_CREATE)
+    public ResponseEntity createReturnForIndent(@PathVariable int id, @RequestBody ReturnIndentViewModel indentViewModel){
+        try{
+            return this.indentService.createReturnForIndent(id, indentViewModel);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 

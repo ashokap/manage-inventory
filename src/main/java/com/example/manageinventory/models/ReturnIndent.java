@@ -10,78 +10,85 @@ import java.util.List;
 /**
  * Created by pana on 24/01/20.
  */
-//@Entity(name = "return_indent")
+@Entity(name = "return_indent")
 public class ReturnIndent {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private int id;
-//    @Column(name = "type")
-//    private ReturnIndentType type;
-//    @Column(name = "remarks")
-//    private String remarks;
-//    @Column(name = "status")
-//    private IndentStatus status;
-//
-//    private Indent originalIndent;
-//
-//    @Column(name = "delivery_date")
-//    private Date deliveryDate;
-//
-//    @OneToOne
-//    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
-//    @JoinColumn(name = "user_id")
-//    private User raisedBy;
-//
-//    @Column(name = "total_price")
-//    private double totalPrice;
-//
-////    @OneToOne
-////    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
-////    @JoinColumn(name = "location_id")
-////    private Location location;
-//
-//    public ReturnIndent() {
-//    }
-//
-//    public int getId() {
-//        return id;
-//    }
-//
-//    public void setId(int id) {
-//        this.id = id;
-//    }
-//
-//    public ReturnIndentType getType() {
-//        return type;
-//    }
-//
-//    public void setType(ReturnIndentType type) {
-//        this.type = type;
-//    }
-//
-//    public Date getDeliveryDate() {
-//        return deliveryDate;
-//    }
-//
-//    public void setDeliveryDate(Date deliveryDate) {
-//        this.deliveryDate = deliveryDate;
-//    }
-//
-//    public User getRaisedBy() {
-//        return raisedBy;
-//    }
-//
-//    public void setRaisedBy(User raisedBy) {
-//        this.raisedBy = raisedBy;
-//    }
-//
-//    public double getTotalPrice() {
-//        return totalPrice;
-//    }
-//
-//    public void setTotalPrice(double totalPrice) {
-//        this.totalPrice = totalPrice;
-//    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    @Column(name = "type")
+    private ReturnIndentType type;
+    @Column(name = "remarks")
+    private String remarks;
+    @Column(name = "status")
+    private IndentStatus status;
+    @OneToOne
+    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
+    private Indent indent;
+
+    @OneToMany(mappedBy = "returnIndent")
+    List<IndentLine> indentLineList;
+
+    @Column(name = "return_date")
+    private Date returnDate;
+
+    public ReturnIndent() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public ReturnIndentType getType() {
+        return type;
+    }
+
+    public void setType(ReturnIndentType type) {
+        this.type = type;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public IndentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(IndentStatus status) {
+        this.status = status;
+    }
+
+    public Indent getIndent() {
+        return indent;
+    }
+
+    public void setIndent(Indent indent) {
+        this.indent = indent;
+    }
+
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
+    }
+
+    public List<IndentLine> getIndentLineList() {
+        return indentLineList;
+    }
+
+    public void setIndentLineList(List<IndentLine> indentLineList) {
+        this.indentLineList = indentLineList;
+    }
 
 
 }

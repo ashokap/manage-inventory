@@ -1,5 +1,8 @@
 package com.example.manageinventory.view_models;
 
+import com.example.manageinventory.models.IndentStatus;
+import com.example.manageinventory.models.ReturnIndentStatus;
+
 import java.util.Date;
 import java.util.List;
 
@@ -12,7 +15,11 @@ public class ReturnIndentViewModel {
 
     private String type;
 
-    List<IndentLineViewModel> indentLines;
+    private String remarks;
+
+    private ReturnIndentStatus status;
+
+    List<IndentLineViewModel> indentLineList;
 
     private Date indentDate;
 
@@ -24,12 +31,12 @@ public class ReturnIndentViewModel {
         this.id = id;
     }
 
-    public List<IndentLineViewModel> getIndentLines() {
-        return indentLines;
+    public List<IndentLineViewModel> getIndentLineList() {
+        return indentLineList;
     }
 
-    public void setIndentLines(List<IndentLineViewModel> indentLines) {
-        this.indentLines = indentLines;
+    public void setIndentLineList(List<IndentLineViewModel> indentLineList) {
+        this.indentLineList = indentLineList;
     }
 
     public String getType() {
@@ -46,5 +53,21 @@ public class ReturnIndentViewModel {
 
     public void setIndentDate(Date indentDate) {
         this.indentDate = indentDate;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public ReturnIndentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReturnIndentStatus status) {
+        this.status = status;
     }
 }

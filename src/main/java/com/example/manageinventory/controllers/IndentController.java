@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin
 @RequestMapping(path = APIConstants.Indent.INDENT_ROOT)
 public class IndentController {
 
@@ -42,10 +43,21 @@ public class IndentController {
 
     //Get details of an inventory
     @GetMapping(path = APIConstants.Indent.INDENT_GET_UPDATE_DELETE)
-    public ResponseEntity getLocationById(
+    public ResponseEntity getIndentById(
             @PathVariable int id) {
         try {
             return this.indentService.getIndentById(id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    //Get details of an inventory
+    @GetMapping(path = APIConstants.Indent.INDENT_GET_UPDATE_DELETE+"/indent_lines")
+    public ResponseEntity getIndentLines(
+            @PathVariable int id) {
+        try {
+            return this.indentService.getIndentLines(id);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -64,7 +76,7 @@ public class IndentController {
     }
 
     @PutMapping(path = APIConstants.Indent.INDENT_GET_UPDATE_DELETE)
-    public ResponseEntity updateLocation(@RequestBody final IndentViewModel indentViewModel,
+    public ResponseEntity updateIndent(@RequestBody final IndentViewModel indentViewModel,
                                          @PathVariable int id) {
         try{
             return this.indentService.updateIndentDetails(id, indentViewModel);

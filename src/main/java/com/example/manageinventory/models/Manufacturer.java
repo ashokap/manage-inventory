@@ -21,6 +21,8 @@ public class Manufacturer {
     private String address3;
     @OneToMany(mappedBy = "manufacturer")
     private List<Product> productList;
+    @Column(name = "available")
+    private Boolean available;
 
 
     public Manufacturer() {
@@ -72,5 +74,13 @@ public class Manufacturer {
 
     public void setProductList(List<Product> productList) {
         this.productList = productList;
+    }
+
+    public Boolean getAvailable() {
+        return available;
+    }
+
+    public void setAvailable(Boolean available) {
+        this.available = available;
     }
 }

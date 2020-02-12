@@ -1,6 +1,5 @@
 package com.example.manageinventory.view_models;
 
-import javax.persistence.*;
 import java.util.List;
 
 /**
@@ -13,7 +12,7 @@ public class LocationViewModel {
 
     private String type;
 
-    private Boolean isAvailable;
+    private Boolean available;
 
     private List<Integer> productList;
 
@@ -42,11 +41,11 @@ public class LocationViewModel {
     }
 
     public Boolean getAvailable() {
-        return isAvailable;
+        return available;
     }
 
     public void setAvailable(Boolean available) {
-        isAvailable = available;
+        this.available = available;
     }
 
     public List<Integer> getProductList() {

@@ -15,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.validation.constraints.Positive;
 
 @RestController
+@CrossOrigin
 @RequestMapping(path = APIConstants.Location.LOCATION_ROOT)
 public class LocationController {
     @Autowired

@@ -12,7 +12,7 @@ public class APIConstants {
     //Product APIs
     public class Product {
         public static final String PRODUCT_ROOT = ROOT_PATH+"/products";
-        public static final String PRODUCT_REGISTER = "/register";
+        //public static final String PRODUCT_REGISTER = "/register";
         public static final String PRODUCT_GET_UPDATE_DELETE = "/{id}";
 
         public static final String PRODUCT_LOCATIONS = "{id}/locations";
@@ -45,5 +45,9 @@ public class APIConstants {
         public static final String USER_RESET_PASSWORD = "{id}/reset";
     }
 
+    public class Manufacturer {
+        public static final String MANUFACTURER_ROOT = ROOT_PATH+"/manufacturers";
+        public static final String MANUFACTURER_GET_UPDATE_DELETE = "/{id}";
+    }
 
 }

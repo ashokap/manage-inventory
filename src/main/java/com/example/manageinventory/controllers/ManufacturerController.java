@@ -1,36 +1,68 @@
 package com.example.manageinventory.controllers;
 
-import com.example.manageinventory.models.Manufacturer;
-import com.example.manageinventory.models.Product;
-import com.example.manageinventory.repositories.ManufacturerRepository;
+import com.example.manageinventory.constants.APIConstants;
+import com.example.manageinventory.services.ManufacturerService;
+import com.example.manageinventory.view_models.ManufacturerViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-
 @RestController
-@RequestMapping("/api/1//ims/manufacturers")
+@CrossOrigin
+@RequestMapping(path = APIConstants.Manufacturer.MANUFACTURER_ROOT)
 public class ManufacturerController {
     @Autowired
-    private ManufacturerRepository manufacturerRepository;
+    private ManufacturerService manufacturerService;
 
     //Get list of products in the inventory
-    @GetMapping("list")
-    public List<Manufacturer> list() {
-        return this.manufacturerRepository.findAll();
+    @GetMapping
+
+    public ResponseEntity listOfManufacturers() {
+        try {
+            return this.manufacturerService.getListOfManufacturers();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     //Get details of a product
     @GetMapping("{id}")
-    public Optional<Manufacturer> getById(
+    public ResponseEntity getById(
             @PathVariable int id) {
-        return this.manufacturerRepository.findById(id);
+        try {
+            return this.manufacturerService.getManufacturerById(id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = APIConstants.Manufacturer.MANUFACTURER_GET_UPDATE_DELETE)
+    public ResponseEntity deleteManufacturer(@PathVariable int id) {
+        try{
+            return this.manufacturerService.updateManufacturerMarkAsUnavailable(id);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping
-    public Manufacturer create(@RequestBody final Manufacturer manufacturer) {
-        return manufacturerRepository.saveAndFlush(manufacturer);
+    public ResponseEntity create(@RequestBody final ManufacturerViewModel manufacturer) {
+        try {
+            return this.manufacturerService.createNewManufacturer(manufacturer);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping(path = APIConstants.Manufacturer.MANUFACTURER_GET_UPDATE_DELETE)
+    public ResponseEntity update(@PathVariable int id,
+                               @RequestBody final ManufacturerViewModel manufacturer) {
+        try {
+            return this.manufacturerService.updateManufacturerDetails(id, manufacturer);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 

@@ -1,7 +1,6 @@
 package com.example.manageinventory.models;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,7 +16,7 @@ public class Location {
     @Column(name = "type")
     private String type;
     @Column(name = "is_available")
-    private Boolean isAvailable;
+    private Boolean available;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -55,11 +54,11 @@ public class Location {
     }
 
     public Boolean getAvailable() {
-        return isAvailable;
+        return available;
     }
 
     public void setAvailable(Boolean available) {
-        isAvailable = available;
+        this.available = available;
     }
 
     public Set<Product> getProducts() {
@@ -76,7 +75,7 @@ public class Location {
                 "id=" + id +
                 ", description='" + description + '\'' +
                 ", type='" + type + '\'' +
-                ", isAvailable=" + isAvailable +
+                ", isAvailable=" + available +
                 ", products=" + products +
                 '}';
     }

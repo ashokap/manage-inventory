@@ -20,7 +20,7 @@ public class ReturnIndent {
     @Column(name = "remarks")
     private String remarks;
     @Column(name = "status")
-    private IndentStatus status;
+    private ReturnIndentStatus status;
     @OneToOne
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     private Indent indent;
@@ -58,11 +58,11 @@ public class ReturnIndent {
         this.remarks = remarks;
     }
 
-    public IndentStatus getStatus() {
+    public ReturnIndentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(IndentStatus status) {
+    public void setStatus(ReturnIndentStatus status) {
         this.status = status;
     }
 

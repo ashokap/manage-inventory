@@ -22,12 +22,11 @@ public class IndentLine {
     private double unitPrice;
 
     @ManyToOne
-    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JoinColumn(name = "indent_id", nullable = false)
     private Indent indent;
 
     @ManyToOne
-    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
+    //@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JoinColumn(name = "return_indent_id", nullable = false)
     private ReturnIndent returnIndent;
 

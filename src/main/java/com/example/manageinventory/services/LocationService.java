@@ -53,9 +53,9 @@ public class LocationService implements InitializingBean {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Location with ID: %d not found",id));
         }
 
-        BeanUtils.copyProperties(locationViewModel, location, "id","productList");
+        BeanUtils.copyProperties(locationViewModel, location, "id","productList", "available");
         locationRepository.saveAndFlush(location);
-        return ResponseEntity.status(HttpStatus.CREATED).body(location);
+        return ResponseEntity.status(HttpStatus.OK).body(location);
     }
 
     public ResponseEntity updateLocationMarkAsDelete(int id) {
@@ -64,6 +64,7 @@ public class LocationService implements InitializingBean {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Location with ID: %d not found",id));
         }
         location.setAvailable(false);
-        return ResponseEntity.status(HttpStatus.OK).body(String.format("Location %d has been marked as Un Available", location.getId()));
+        locationRepository.saveAndFlush(location);
+        return ResponseEntity.status(HttpStatus.OK).body(String.format("Location %d has been marked as Not Available", location.getId()));
     }
 }

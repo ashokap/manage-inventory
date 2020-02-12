@@ -38,8 +38,8 @@ public class Product {
     @JsonIgnore //  prevent back serialization for many to many
     @JoinTable(
             name = "location_product",
-            joinColumns = @JoinColumn(name = "location_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "location_id")
     )
     private Set<Location> locations;
 

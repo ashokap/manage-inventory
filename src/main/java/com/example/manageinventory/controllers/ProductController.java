@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin
 @RequestMapping(path = APIConstants.Product.PRODUCT_ROOT)
 public class ProductController {
 
@@ -58,7 +59,7 @@ public class ProductController {
      * @return
      */
 
-    @PostMapping(path = APIConstants.Product.PRODUCT_REGISTER)
+    @PostMapping
     public ResponseEntity create(@RequestBody final ProductViewModel product) {
         try {
             return this.productService.registerNewProduct(product);

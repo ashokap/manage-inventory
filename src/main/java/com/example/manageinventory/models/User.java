@@ -11,15 +11,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name = "type")
-    private Enum<UserType> type;
+    private UserType type;
     @Column(name = "name")
     private String name;
     @Column(name = "email")
     private String email;
+    @Column(name = "password")
+    private String password;
     @Column(name = "user_code")
     private String userCode;
     @Column(name = "is_active")
-    private Boolean isActive;
+    private Boolean active;
     @Column(name = "contact_number")
     private String contactNumber;
     @Column(name = "display_name")
@@ -28,12 +30,12 @@ public class User {
     public User() {
     }
 
-    public User(Enum<UserType> type, String name, String email, String userCode, Boolean isActive, String contactNumber, String displayName) {
+    public User(UserType type, String name, String email, String userCode, Boolean active, String contactNumber, String displayName) {
         this.type = type;
         this.name = name;
         this.email = email;
         this.userCode = userCode;
-        this.isActive = isActive;
+        this.active = active;
         this.contactNumber = contactNumber;
         this.displayName = displayName;
     }
@@ -46,11 +48,11 @@ public class User {
         this.id = id;
     }
 
-    public Enum<UserType> getType() {
+    public UserType getType() {
         return type;
     }
 
-    public void setType(Enum<UserType> type) {
+    public void setType(UserType type) {
         this.type = type;
     }
 
@@ -79,11 +81,11 @@ public class User {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(Boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     public String getContactNumber() {
@@ -102,6 +104,14 @@ public class User {
         this.displayName = displayName;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -110,7 +120,7 @@ public class User {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", userCode='" + userCode + '\'' +
-                ", isActive=" + isActive +
+                ", isActive=" + active +
                 ", contactNumber='" + contactNumber + '\'' +
                 ", displayName='" + displayName + '\'' +
                 '}';

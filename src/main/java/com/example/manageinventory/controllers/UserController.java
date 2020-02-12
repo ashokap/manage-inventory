@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping(path = APIConstants.User.USER_ROOT)
 public class UserController {
 
@@ -45,7 +46,6 @@ public class UserController {
     public ResponseEntity getUserById(
             @PathVariable int id) {
         try {
-            System.out.println("ROOT: "+APIConstants.User.USER_ROOT);
             return this.userService.getUserById(id);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -61,8 +61,6 @@ public class UserController {
     @PostMapping
     public ResponseEntity create(@RequestBody final UserViewModel user) {
         try {
-            System.out.println("ROOT: "+APIConstants.User.USER_ROOT);
-            System.out.println("Body: "+user.toString());
             return this.userService.signUpNewUser(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

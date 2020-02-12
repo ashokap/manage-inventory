@@ -1,5 +1,8 @@
 package com.example.manageinventory.view_models;
 
+import com.example.manageinventory.models.IndentStatus;
+import com.example.manageinventory.models.IndentType;
+
 import java.util.List;
 
 /**
@@ -9,9 +12,13 @@ public class IndentViewModel {
 
     private int id;
 
-    private String type;
+    private IndentType type;
 
-    List<IndentLineViewModel> indentLines;
+    private String remarks;
+
+    private IndentStatus status;
+
+    List<IndentLineViewModel> indentLineList;
 
     private String deliveryDate;
 
@@ -29,19 +36,19 @@ public class IndentViewModel {
         this.id = id;
     }
 
-    public List<IndentLineViewModel> getIndentLines() {
-        return indentLines;
+    public List<IndentLineViewModel> getIndentLineList() {
+        return indentLineList;
     }
 
-    public void setIndentLines(List<IndentLineViewModel> indentLines) {
-        this.indentLines = indentLines;
+    public void setIndentLineList(List<IndentLineViewModel> indentLineList) {
+        this.indentLineList = indentLineList;
     }
 
-    public String getType() {
+    public IndentType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(IndentType type) {
         this.type = type;
     }
 
@@ -77,12 +84,30 @@ public class IndentViewModel {
         this.location_id = location_id;
     }
 
+    public IndentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(IndentStatus status) {
+        this.status = status;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
     @Override
     public String toString() {
         return "IndentViewModel{" +
                 "id=" + id +
-                ", type='" + type + '\'' +
-                ", indentLines=" + indentLines +
+                ", type=" + type +
+                ", remarks='" + remarks + '\'' +
+                ", status=" + status +
+                ", indentLineList=" + indentLineList +
                 ", deliveryDate='" + deliveryDate + '\'' +
                 ", raisedBy=" + raisedBy +
                 ", totalPrice=" + totalPrice +

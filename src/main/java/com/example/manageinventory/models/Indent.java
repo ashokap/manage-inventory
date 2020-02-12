@@ -1,10 +1,10 @@
 package com.example.manageinventory.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,13 +24,17 @@ public class Indent {
     private IndentStatus status;
 
     @OneToMany(mappedBy = "indent")
+    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     List<IndentLine> indentLineList;
+
     @Column(name = "delivery_date")
     private Date deliveryDate;
+
     @OneToOne
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JoinColumn(name = "user_id")
     private User raisedBy;
+
     @Column(name = "total_price")
     private double totalPrice;
 
@@ -56,6 +60,22 @@ public class Indent {
 
     public void setType(IndentType type) {
         this.type = type;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public IndentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(IndentStatus status) {
+        this.status = status;
     }
 
     public List<IndentLine> getIndentLineList() {
@@ -90,22 +110,6 @@ public class Indent {
         this.totalPrice = totalPrice;
     }
 
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public IndentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(IndentStatus status) {
-        this.status = status;
-    }
-
     public Location getLocation() {
         return location;
     }
@@ -114,18 +118,14 @@ public class Indent {
         this.location = location;
     }
 
-    @Override
-    public String toString() {
-        return "Indent{" +
-                "id=" + id +
-                ", type=" + type +
-                ", remarks='" + remarks + '\'' +
-                ", status=" + status +
-                ", indentLineList=" + indentLineList +
-                ", deliveryDate=" + deliveryDate +
-                ", raisedBy=" + raisedBy +
-                ", totalPrice=" + totalPrice +
-                ", location=" + location +
-                '}';
+
+    public void addIndentLine(IndentLine indentLine){
+        System.out.println("Current IndentList: "+indentLineList);
+        if(indentLineList == null){
+            indentLineList = new ArrayList<>();
+        }
+        indentLineList.add(indentLine);
+        indentLine.setIndent(this);
     }
+
 }

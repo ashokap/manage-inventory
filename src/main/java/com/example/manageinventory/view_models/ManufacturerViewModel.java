@@ -18,6 +18,8 @@ public class ManufacturerViewModel {
 
     private String address3;
 
+    private Boolean available;
+
     private List<Long> productList;
 
     public Long getId() {
@@ -66,5 +68,13 @@ public class ManufacturerViewModel {
 
     public void setProductList(List<Long> productList) {
         this.productList = productList;
+    }
+
+    public Boolean getAvailable() {
+        return available;
+    }
+
+    public void setAvailable(Boolean available) {
+        this.available = available;
     }
 }

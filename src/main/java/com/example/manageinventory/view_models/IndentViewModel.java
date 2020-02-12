@@ -3,7 +3,8 @@ package com.example.manageinventory.view_models;
 import com.example.manageinventory.models.IndentStatus;
 import com.example.manageinventory.models.IndentType;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by pana on 24/01/20.
@@ -18,7 +19,7 @@ public class IndentViewModel {
 
     private IndentStatus status;
 
-    List<IndentLineViewModel> indentLineList;
+    Set<IndentLineViewModel> indentLineList = new HashSet<>();
 
     private String deliveryDate;
 
@@ -36,11 +37,11 @@ public class IndentViewModel {
         this.id = id;
     }
 
-    public List<IndentLineViewModel> getIndentLineList() {
+    public Set<IndentLineViewModel> getIndentLineList() {
         return indentLineList;
     }
 
-    public void setIndentLineList(List<IndentLineViewModel> indentLineList) {
+    public void setIndentLineList(Set<IndentLineViewModel> indentLineList) {
         this.indentLineList = indentLineList;
     }
 

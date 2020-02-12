@@ -1,5 +1,6 @@
 package com.example.manageinventory.view_models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ public class LocationViewModel {
 
     private Boolean available;
 
-    private List<Integer> productList;
+    private List<Integer> productList = new ArrayList<>();
 
     public int getId() {
         return id;

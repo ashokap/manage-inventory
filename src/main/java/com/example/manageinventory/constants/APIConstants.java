@@ -1,7 +1,7 @@
 package com.example.manageinventory.constants;
 
 public class APIConstants {
-    public static final String ROOT_PATH = "/api/1/ims";
+    public static final String ROOT_PATH = "/api/v1/ims";
 
     //User Authentication
     public class UserAuthentication {
@@ -42,7 +42,8 @@ public class APIConstants {
     public class User {
         public static final String USER_ROOT = ROOT_PATH+"/users";
         public static final String USER_GET_UPDATE_DELETE = "/{id}";
-        public static final String USER_RESET_PASSWORD = "{id}/reset";
+        public static final String USER_RESET_PASSWORD = "/reset";
+        public static final String USER_LOGIN = "/login";
     }
 
     public class Manufacturer {

@@ -6,7 +6,6 @@ import com.example.manageinventory.repositories.*;
 import com.example.manageinventory.view_models.IndentLineViewModel;
 import com.example.manageinventory.view_models.IndentViewModel;
 import com.example.manageinventory.view_models.ReturnIndentViewModel;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +29,8 @@ public class IndentService implements InitializingBean {
     private LocationRepository locationRepository;
     @Autowired
     private IndentLineRepository indentLineRepository;
+    @Autowired
+    private LocationService locationService;
 
     public static Map<String, String> validationErrorObj =  new HashMap<>();
 
@@ -38,20 +39,40 @@ public class IndentService implements InitializingBean {
         
     }
 
+    /**
+     * Get list of Indents
+     * @return
+     */
     public ResponseEntity getListOfIndents(){
-        return ResponseEntity.status(HttpStatus.OK).body(this.indentRepository.findAll());
+        List<Indent> indentList = this.indentRepository.findAll();
+
+        List<IndentViewModel> indentViewModelList = new ArrayList<>();
+        for(Indent indent: indentList){
+            indentViewModelList.add(mapToIndentViewModel(indent));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(indentViewModelList);
     }
 
+    /**
+     * Get details of Indent Record by Id
+     * @param id
+     * @return
+     */
     public ResponseEntity getIndentById(int id) {
         Indent indent = this.indentRepository.findIndentById(id);
         if(indent == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Indent Not Found for ID: %d", id));
-        }
-
-        System.out.println(indent.getIndentLineList());
-        return ResponseEntity.status(HttpStatus.OK).body(indent);
+        };
+        return ResponseEntity.status(HttpStatus.OK).body(mapToIndentViewModel(indent));
     }
 
+    /**
+     * Create a new Indent
+     * @param indentViewModel
+     * @return
+     * @throws ParseException
+     */
     @Transactional
     public ResponseEntity createNewIndent(IndentViewModel indentViewModel) throws ParseException {
 
@@ -68,6 +89,7 @@ public class IndentService implements InitializingBean {
             indent.setStatus(IndentStatus.ORDER_RECEIVED);
         }
 
+        //Save the indent so that we can create indent lines for the persisted indent record
         indent = indentRepository.saveAndFlush(indent);
         //Validate and Set Indent Lines
         if (!validateIndentViewLines(indentViewModel.getIndentLineList(), indent)){
@@ -79,12 +101,13 @@ public class IndentService implements InitializingBean {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationErrorObj);
             }
         }
-        System.out.println(String.format("\n Indent Obj: %s, Indent Model: %s \n",indent.toString(), indentViewModel.toString() ));
+
         indentRepository.saveAndFlush(indent);
-        return ResponseEntity.status(HttpStatus.CREATED).body(indent);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapToIndentViewModel(indent));
     }
 
-    private Boolean validateIndentViewLines(List<IndentLineViewModel> indentLineViewModels, Indent indent){
+    //Validate Line items and add them to indent
+    private Boolean validateIndentViewLines(Set<IndentLineViewModel> indentLineViewModels, Indent indent){
         if(indentLineViewModels.size() <= 0){
             setValidationErrorObject("Validation", "Atleast one product must be present while creating Indent",
                     "Indent", "IndentLines");
@@ -93,8 +116,6 @@ public class IndentService implements InitializingBean {
 
         //Go through each incoming indentline and cross check if the product exists or not. If not return error
         // return error if any of the product gets mismatched
-//        List<IndentLine> indentLines = new ArrayList<>();
-
         for(IndentLineViewModel indentLineViewModel: indentLineViewModels){
             //Check if there is a product for the given ID
             Product registeredProduct = productRepository.findProductById(indentLineViewModel.getProduct_id());
@@ -113,13 +134,11 @@ public class IndentService implements InitializingBean {
             indentLine = indentLineRepository.saveAndFlush(indentLine);
             indent.addIndentLine(indentLine);
         }
-
-        System.out.println(String.format("\n Indent's IndentLines: %d", indent.getIndentLineList().size()));
-
         return true;
     }
 
-    private boolean validateAndSetLocation(int location_id, Indent indent, Boolean updateProductQuantity) {
+    //Validate Location and set the indent's and its products location
+    private Boolean validateAndSetLocation(int location_id, Indent indent, Boolean updateProductQuantity) {
         //Get the location from id
         Location location = locationRepository.findLocationById(location_id);
         if(location == null){
@@ -144,8 +163,9 @@ public class IndentService implements InitializingBean {
             }
 
             productRepository.saveAndFlush(product);
-            //TODO: Need to populate indent_id and quantity to this "location_product" table
+            //TODO: Need to populate indent_id and quantity to this "location_product" table. For this need to have additional properties to many to many relation.
         }
+        //Set total price during creation only
         if(updateProductQuantity) {
             indent.setTotalPrice(totalPrice);
         }
@@ -153,6 +173,13 @@ public class IndentService implements InitializingBean {
         return true;
     }
 
+    /**
+     * Update Indent details. Only status, remarks, delivery, location date is updatable
+     * @param id
+     * @param indentViewModel
+     * @return
+     * @throws ParseException
+     */
     @Transactional
     public ResponseEntity updateIndentDetails(int id, IndentViewModel indentViewModel) throws ParseException {
 
@@ -163,11 +190,12 @@ public class IndentService implements InitializingBean {
 
         List<String> indentStatusArray = Arrays.asList(IndentStatus.DELETED.toString(), IndentStatus.DISPATCHED.toString(), IndentStatus.PROCESSED.toString());
 
+        //Deleted, dispatched or processed indents cannot be updated to any other status
         if(indentStatusArray.contains(indent.getStatus().toString())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Indent has been marked as %s and hence cannot be updated further", indent.getStatus().toString()));
         }
         //Incoming Indent's status can only be updated to "Processed" and outgoing indent's status can only be updated to "Dispatched
-        if((indentViewModel.getStatus()!= null) &&
+        if((indentViewModel.getStatus()!= null && indentViewModel.getStatus() != indent.getStatus()) &&
                 (indent.getStatus() == IndentStatus.ORDER_PLACED && indentViewModel.getStatus() != IndentStatus.PROCESSED)
                 || (indent.getStatus() == IndentStatus.ORDER_RECEIVED && indentViewModel.getStatus() != IndentStatus.DISPATCHED)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Indent has been marked as %s and cannot be updated as %s",indent.getStatus().toString(), indentViewModel.getStatus().toString()));
@@ -185,27 +213,40 @@ public class IndentService implements InitializingBean {
             }
         }
         indentRepository.saveAndFlush(indent);
-        return ResponseEntity.status(HttpStatus.CREATED).body(indent);
+        return ResponseEntity.status(HttpStatus.OK).body(mapToIndentViewModel(indent));
     }
 
+    /**
+     * Delete Indent and mark its status as "Deleted"
+     * @param id
+     * @return
+     */
     @Transactional
     public ResponseEntity markIndentAsDeleted(int id) {
         Indent indent = this.indentRepository.findIndentById(id);
         if(indent == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Indent with ID: %d not found",id));
         }
+        if(indent.getStatus() == IndentStatus.DELETED){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Indent ID: %d is already Deleted.",id));
+        }
+
         indent.setStatus(IndentStatus.DELETED);
         return ResponseEntity.status(HttpStatus.OK).body(String.format("Indent %d has been marked as Deleted", indent.getId()));
     }
 
+    /**
+     * Get Location for a given indent. currently a single location can be applied to an indent
+     * @param id
+     * @return
+     */
     @Transactional
     public ResponseEntity getLocationsForIndent(int id) {
         Indent indent = this.indentRepository.findIndentById(id);
         if(indent == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Indent with ID: %d not found",id));
         }
-
-        return ResponseEntity.status(HttpStatus.OK).body(indent.getLocation());
+        return ResponseEntity.status(HttpStatus.OK).body(locationService.mapToLocationView(indent.getLocation()));
     }
 
     @Transactional
@@ -229,7 +270,13 @@ public class IndentService implements InitializingBean {
         if(returnIndentViewModel.getIndentLineList() == null || returnIndentViewModel.getIndentLineList().size() <= 0){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Return Indent Line should atleast contain 1 product from the original indent."));
         }else{
-            //List<IndentLine> indentLineList = indent.getIndentLineList();
+            Set<IndentLine> parentIndentLineList = indent.getIndentLineList();
+            //TODO> since indent.getIndentLines is not returning all the child lines, getting the indentlines directly from db.
+            // To be investigated further
+            if(parentIndentLineList.size() == 0){
+                parentIndentLineList = indentLineRepository.getAllIndentLinesForIndent(indent.getId());
+            }
+
             System.out.println(indent.getIndentLineList());
             System.out.println("\n HERE \n");
             List<IndentLine> returnIndentLines = new ArrayList<>();
@@ -238,7 +285,7 @@ public class IndentService implements InitializingBean {
             for(IndentLineViewModel returnIndentLineViewModel: returnIndentViewModel.getIndentLineList()){
                 IndentLine indentLineFound = new IndentLine();
                 //Go through each of the indent's indentlines and see if the product is present or not
-                for(IndentLine parentIndentLine: indent.getIndentLineList()){
+                for(IndentLine parentIndentLine: parentIndentLineList){
                     if(parentIndentLine.getProduct().getId() == returnIndentLineViewModel.getProduct_id()){
                         indentLineFound = parentIndentLine;
                         break;
@@ -269,6 +316,8 @@ public class IndentService implements InitializingBean {
             returnIndent.setIndentLineList(returnIndentLines);
             returnIndent.setReturnDate(new Date());
             returnIndent.setRemarks(returnIndentViewModel.getRemarks());
+            //Save the return indent
+            returnIndentRepository.saveAndFlush(returnIndent);
 
             //Now update product's quantity based on the retuned line items
             for(IndentLine returnIndentLine: returnIndent.getIndentLineList()){
@@ -283,8 +332,6 @@ public class IndentService implements InitializingBean {
                 this.productRepository.saveAndFlush(product);
             }
 
-            //Save the return indent
-            returnIndentRepository.saveAndFlush(returnIndent);
             //Save return indent line items
             indentLineRepository.saveAll(returnIndentLines);
             return ResponseEntity.status(HttpStatus.CREATED).body(returnIndent);
@@ -307,5 +354,45 @@ public class IndentService implements InitializingBean {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(indent.getIndentLineList());
+    }
+
+    public IndentViewModel mapToIndentViewModel(Indent indent){
+        IndentViewModel indentViewModel = new IndentViewModel();
+        indentViewModel.setType(indent.getType());
+        indentViewModel.setDeliveryDate(indent.getDeliveryDate().toString());
+        indentViewModel.setId(indent.getId());
+        indentViewModel.setLocation_id(indent.getLocation().getId());
+        if(indent.getRaisedBy() != null){
+            indentViewModel.setRaisedBy(indent.getRaisedBy().getId());
+        }
+
+        indentViewModel.setRemarks(indent.getRemarks());
+        indentViewModel.setStatus(indent.getStatus());
+        indentViewModel.setTotalPrice(indent.getTotalPrice());
+        //Map indent line items
+        Set<IndentLineViewModel> indentLineViewModelSet = new HashSet<>();
+        Set<IndentLine> indentLines = indent.getIndentLineList();
+        //TODO: Getting indentlines from indent is not working automatically. Hence as a temp fix, getting the indent lines explicitly
+        if (indentLines.size() == 0){
+            indentLines = indentLineRepository.getAllIndentLinesForIndent(indent.getId());
+        }
+
+        for(IndentLine indentLine: indentLines){
+            IndentLineViewModel indentLineViewModel = mapToIndentLineViewModel(indentLine);
+            indentLineViewModelSet.add(indentLineViewModel);
+        }
+        indentViewModel.setIndentLineList(indentLineViewModelSet);
+        return indentViewModel;
+    }
+
+    public IndentLineViewModel mapToIndentLineViewModel(IndentLine indentLine){
+        IndentLineViewModel indentLineViewModel = new IndentLineViewModel();
+
+        indentLineViewModel.setId(indentLine.getId());
+        indentLineViewModel.setProduct_id(indentLine.getProduct().getId());
+        indentLineViewModel.setQuantity(indentLine.getQuantity());
+        indentLineViewModel.setUnitPrice(indentLine.getUnitPrice());
+
+        return indentLineViewModel;
     }
 }

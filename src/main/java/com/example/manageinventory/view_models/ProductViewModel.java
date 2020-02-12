@@ -1,5 +1,8 @@
 package com.example.manageinventory.view_models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by pana on 24/01/20.
  */
@@ -13,8 +16,11 @@ public class ProductViewModel {
     private String sku;
     private String description;
     private String status;
+    private List<Integer> locationList = new ArrayList<>();
 
     private int manufacturer_id;
+
+    private int quantity;
 
     public int getId() {
         return id;
@@ -86,6 +92,22 @@ public class ProductViewModel {
 
     public void setManufacturer_id(int manufacturer_id) {
         this.manufacturer_id = manufacturer_id;
+    }
+
+    public List<Integer> getLocationList() {
+        return locationList;
+    }
+
+    public void setLocationList(List<Integer> locationList) {
+        this.locationList = locationList;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     @Override

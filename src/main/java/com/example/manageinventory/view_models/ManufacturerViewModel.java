@@ -1,6 +1,6 @@
 package com.example.manageinventory.view_models;
 
-import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,7 +8,7 @@ import java.util.List;
  */
 
 public class ManufacturerViewModel {
-    private Long id;
+    private int id;
 
     private String name;
 
@@ -20,13 +20,13 @@ public class ManufacturerViewModel {
 
     private Boolean available;
 
-    private List<Long> productList;
+    private List<Integer> productList = new ArrayList<>();
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -62,11 +62,11 @@ public class ManufacturerViewModel {
         this.address3 = address3;
     }
 
-    public List<Long> getProductList() {
+    public List<Integer> getProductList() {
         return productList;
     }
 
-    public void setProductList(List<Long> productList) {
+    public void setProductList(List<Integer> productList) {
         this.productList = productList;
     }
 

@@ -1,6 +1,7 @@
 package com.example.manageinventory.models;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public class Manufacturer {
     @Column(name = "address3")
     private String address3;
     @OneToMany(mappedBy = "manufacturer")
-    private List<Product> productList;
+    private List<Product> productList = new ArrayList<>();
     @Column(name = "available")
     private Boolean available;
 

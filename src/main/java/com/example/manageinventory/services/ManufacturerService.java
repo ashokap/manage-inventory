@@ -1,6 +1,7 @@
 package com.example.manageinventory.services;
 
 import com.example.manageinventory.models.Manufacturer;
+import com.example.manageinventory.models.Product;
 import com.example.manageinventory.repositories.ManufacturerRepository;
 import com.example.manageinventory.repositories.ManufacturerRepository;
 import com.example.manageinventory.view_models.ManufacturerViewModel;
@@ -63,5 +64,21 @@ public class ManufacturerService implements InitializingBean {
         manufacturer.setAvailable(false);
         manufacturerRepository.saveAndFlush(manufacturer);
         return ResponseEntity.status(HttpStatus.OK).body(String.format("Manufacturer %d has been marked as Not Available", manufacturer.getId()));
+    }
+
+    public ManufacturerViewModel mapToManufacturerView(Manufacturer manufacturer){
+        ManufacturerViewModel manufacturerViewModel = new ManufacturerViewModel();
+
+        manufacturerViewModel.setAddress1(manufacturer.getAddress1());
+        manufacturerViewModel.setAddress2(manufacturer.getAddress2());
+        manufacturerViewModel.setAddress3(manufacturer.getAddress3());
+        manufacturerViewModel.setId(manufacturer.getId());
+        manufacturerViewModel.setAvailable(manufacturer.getAvailable());
+        manufacturerViewModel.setName(manufacturer.getName());
+
+        for(Product product: manufacturer.getProductList()){
+            manufacturerViewModel.getProductList().add(product.getId());
+        }
+        return manufacturerViewModel;
     }
 }

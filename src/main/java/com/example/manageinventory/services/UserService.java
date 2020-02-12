@@ -28,6 +28,11 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.OK).body(userObj);
     }
 
+    //Helper method to get user by email. Used by Authentication module
+    public User getUserByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
     public ResponseEntity signUpNewUser(UserViewModel user) {
         User userObj = new User();
         BeanUtils.copyProperties(user, userObj, "id", "active");
@@ -59,5 +64,18 @@ public class UserService {
         userRepository.saveAndFlush(userObj);
 
         return ResponseEntity.status(HttpStatus.OK).body("User has been marked as Inactive");
+    }
+
+    public UserViewModel mapToUserView(User user){
+        UserViewModel userViewModel = new UserViewModel();
+
+        userViewModel.setId(user.getId());
+        userViewModel.setActive(user.getActive());
+        userViewModel.setContactNumber(user.getContactNumber());
+        userViewModel.setDisplayName(user.getDisplayName());
+        userViewModel.setEmail(user.getEmail());
+        userViewModel.setUserCode(user.getUserCode());
+        userViewModel.setType(user.getType());
+        return userViewModel;
     }
 }

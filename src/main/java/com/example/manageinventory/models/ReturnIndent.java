@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class ReturnIndent {
     private Indent indent;
 
     @OneToMany(mappedBy = "returnIndent")
-    List<IndentLine> indentLineList;
+    List<IndentLine> indentLineList = new ArrayList<>();
 
     @Column(name = "return_date")
     private Date returnDate;

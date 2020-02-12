@@ -1,11 +1,10 @@
 package com.example.manageinventory.services;
 
-import com.example.manageinventory.models.Location;
-import com.example.manageinventory.models.Manufacturer;
-import com.example.manageinventory.models.Product;
-import com.example.manageinventory.models.ProductStatus;
+import com.example.manageinventory.models.*;
 import com.example.manageinventory.repositories.ManufacturerRepository;
 import com.example.manageinventory.repositories.ProductRepository;
+import com.example.manageinventory.view_models.IndentViewModel;
+import com.example.manageinventory.view_models.LocationViewModel;
 import com.example.manageinventory.view_models.ProductViewModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -14,11 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -28,6 +25,8 @@ public class ProductService implements InitializingBean {
     private ProductRepository productRepository;
     @Autowired
     private ManufacturerRepository manufacturerRepository;
+    @Autowired
+    private LocationService locationService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -39,8 +38,14 @@ public class ProductService implements InitializingBean {
      * @return
      */
     public ResponseEntity getListOfProducts(){
+        List<Product> products = this.productRepository.findAll();
 
-        return ResponseEntity.status(HttpStatus.OK).body(this.productRepository.findAll());
+        List<ProductViewModel> productViewModels = new ArrayList<>();
+        for(Product product: products){
+            productViewModels.add(mapToProductViewModel(product));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(productViewModels);
     }
 
     /**
@@ -54,7 +59,7 @@ public class ProductService implements InitializingBean {
         if (existingProduct == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Product with ID: %d not found",id));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(existingProduct);
+        return ResponseEntity.status(HttpStatus.OK).body(mapToProductViewModel(existingProduct));
     }
 
     /**
@@ -71,7 +76,7 @@ public class ProductService implements InitializingBean {
             BeanUtils.copyProperties(product, productObj, "manufacturer_id");
             productObj.setStatus(ProductStatus.REGISTERED);
             productRepository.saveAndFlush(productObj);
-            return ResponseEntity.status(HttpStatus.CREATED).body(productObj);
+            return ResponseEntity.status(HttpStatus.CREATED).body(mapToProductViewModel(productObj));
 
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Manufacturer with ID: %d not found. Cannot create product", product.getManufacturer_id()));
@@ -103,7 +108,7 @@ public class ProductService implements InitializingBean {
             //Now copy all the relevant data to Product DB
             BeanUtils.copyProperties(product, existingProduct, "manufacturer_id","id");
             productRepository.saveAndFlush(existingProduct);
-            return ResponseEntity.status(HttpStatus.OK).body(existingProduct);
+            return ResponseEntity.status(HttpStatus.OK).body(mapToProductViewModel(existingProduct));
         }else{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Product with ID: %d not found",id));
         }
@@ -134,14 +139,43 @@ public class ProductService implements InitializingBean {
 
         if (existingProduct!= null){
             //Get the locations from locations_products table
-            System.out.println("Inside Product Location Fetch: Before"+existingProduct.getLocations());
-//            Set<Location> locations = this.productRepository.findLocationsByProductId(id);
-//            System.out.println("Inside Product Location Fetch: After \n");
-//            System.out.println(locations);
-            return ResponseEntity.status(HttpStatus.OK).body(existingProduct.getLocations());
+            Set<LocationViewModel> locationViewModels = new HashSet<>();
+            for(Location location: existingProduct.getLocations()){
+                locationViewModels.add(locationService.mapToLocationView(location));
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(locationViewModels);
         }else{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Product %d not found", id));
         }
 
     }
+
+    public ProductViewModel mapToProductViewModel(Product product){
+        ProductViewModel productViewModel = new ProductViewModel();
+
+        productViewModel.setUpcCode(product.getUpcCode());
+        if(product.getCategory() != null){
+            productViewModel.setCategory(product.getCategory().toString());
+        }
+        productViewModel.setId(product.getId());
+        productViewModel.setHsnCode(product.getHsnCode());
+        productViewModel.setSku(product.getSku());
+        productViewModel.setManufacturer_id(product.getManufacturer().getId());
+        productViewModel.setDescription(product.getDescription());
+        productViewModel.setName(product.getName());
+        productViewModel.setQuantity(product.getQuantity());
+        if(product.getStatus() != null){
+            productViewModel.setStatus(product.getStatus().toString());
+        }
+
+        for(Location location: product.getLocations()){
+            if(location != null) {
+                productViewModel.getLocationList().add(location.getId());
+            }
+        }
+
+        return productViewModel;
+    }
+
 }

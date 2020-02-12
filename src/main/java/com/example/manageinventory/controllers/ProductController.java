@@ -30,6 +30,8 @@ public class ProductController {
     @GetMapping
     public ResponseEntity listOfProducts() {
         try {
+
+
             return this.productService.getListOfProducts();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

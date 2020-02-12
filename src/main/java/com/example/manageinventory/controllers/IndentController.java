@@ -99,9 +99,9 @@ public class IndentController {
     }
 
     @PostMapping(path = APIConstants.Indent.INDENT_RETURN_CREATE)
-    public ResponseEntity createReturnForIndent(@PathVariable int id, @RequestBody ReturnIndentViewModel indentViewModel){
+    public ResponseEntity createReturnForIndent(@PathVariable int id, @RequestBody ReturnIndentViewModel returnIndentViewModel){
         try{
-            return this.indentService.createReturnForIndent(id, indentViewModel);
+            return this.indentService.createReturnForIndent(id, returnIndentViewModel);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

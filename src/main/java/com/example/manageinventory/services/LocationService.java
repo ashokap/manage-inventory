@@ -67,4 +67,19 @@ public class LocationService implements InitializingBean {
         locationRepository.saveAndFlush(location);
         return ResponseEntity.status(HttpStatus.OK).body(String.format("Location %d has been marked as Not Available", location.getId()));
     }
+
+    public LocationViewModel mapToLocationView(Location location){
+        LocationViewModel locationViewModel = new LocationViewModel();
+        locationViewModel.setId(location.getId());
+        locationViewModel.setAvailable(location.getAvailable());
+        locationViewModel.setDescription(location.getDescription());
+        locationViewModel.setType(location.getType());
+
+        for(Product product: location.getProducts()){
+            locationViewModel.getProductList().add(product.getId());
+        }
+
+        return locationViewModel;
+    }
+
 }

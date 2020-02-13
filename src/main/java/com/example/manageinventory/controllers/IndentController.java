@@ -30,7 +30,12 @@ public class IndentController {
     @Autowired
     private IndentService indentService;
 
-    //Get list of products in the inventory
+
+
+    /**
+     * //Get list of indents
+     * @return
+     */
     @GetMapping
     public ResponseEntity getListOfIndents(){
         try {
@@ -41,7 +46,11 @@ public class IndentController {
 
     }
 
-    //Get details of an inventory
+    /**
+     * //Get details of an indent
+     * @param id
+     * @return
+     */
     @GetMapping(path = APIConstants.Indent.INDENT_GET_UPDATE_DELETE)
     public ResponseEntity getIndentById(
             @PathVariable int id) {
@@ -52,7 +61,11 @@ public class IndentController {
         }
     }
 
-    //Get details of an inventory
+    /**
+     * Get list of all indent lines for a given indent
+     * @param id
+     * @return
+     */
     @GetMapping(path = APIConstants.Indent.INDENT_GET_UPDATE_DELETE+"/indent_lines")
     public ResponseEntity getIndentLines(
             @PathVariable int id) {
@@ -64,6 +77,11 @@ public class IndentController {
     }
 
 
+    /**
+     * Create a new Incoming/Outgoing indent
+     * @param indentViewModel
+     * @return
+     */
 
     @PostMapping
     public ResponseEntity createIndent(@RequestBody final IndentViewModel indentViewModel) {
@@ -74,6 +92,13 @@ public class IndentController {
         }
 
     }
+
+    /**
+     * Update location, status, remarks for an indent
+     * @param indentViewModel
+     * @param id
+     * @return
+     */
 
     @PutMapping(path = APIConstants.Indent.INDENT_GET_UPDATE_DELETE)
     public ResponseEntity updateIndent(@RequestBody final IndentViewModel indentViewModel,
@@ -87,7 +112,11 @@ public class IndentController {
 
     }
 
-
+    /**
+     * Get locations for a given indent
+     * @param id
+     * @return
+     */
     @GetMapping(path = APIConstants.Indent.INDENT_LOCATIONS)
     public ResponseEntity getLocationsForIndent(
             @PathVariable int id) {
@@ -98,6 +127,12 @@ public class IndentController {
         }
     }
 
+    /**
+     * Create a return indent for an incoming/outgoing indent
+     * @param id
+     * @param returnIndentViewModel
+     * @return
+     */
     @PostMapping(path = APIConstants.Indent.INDENT_RETURN_CREATE)
     public ResponseEntity createReturnForIndent(@PathVariable int id, @RequestBody ReturnIndentViewModel returnIndentViewModel){
         try{
@@ -107,9 +142,17 @@ public class IndentController {
         }
     }
 
-
-
-
-
+    /**
+     * Get configurations for managing indent, return indent
+     * @return
+     */
+    @GetMapping(path = APIConstants.Indent.INDENT_CONFIG)
+    public ResponseEntity getIndentConfigs(){
+        try {
+            return this.indentService.getIndentConfigurations();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
 }

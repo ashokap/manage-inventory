@@ -7,7 +7,7 @@ import com.example.manageinventory.models.UserType;
  */
 
 public class UserViewModel {
-    private int id;
+    private String id;
     private UserType type;
     private String name;
     private String email;
@@ -17,11 +17,11 @@ public class UserViewModel {
     private String contactNumber;
     private String displayName;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

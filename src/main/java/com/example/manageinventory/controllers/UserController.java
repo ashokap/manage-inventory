@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-//@CrossOrigin
+@CrossOrigin
 @RequestMapping(path = APIConstants.User.USER_ROOT)
 public class UserController {
     @Autowired
@@ -71,6 +71,37 @@ public class UserController {
         System.out.println("User token: "+jwt);
 
         return ResponseEntity.ok(new TokenResponse(jwt));
+    }
+
+    @PostMapping(path = APIConstants.User.USER_RESET_PASSWORD)
+    public ResponseEntity resetPassword(@RequestBody LoginUserViewModel user) throws Exception {
+        try {
+            System.out.println(userService.getUserByEmail("ashoka.p@gmail.com"));
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+            );
+
+        } catch (BadCredentialsException e) {
+            throw new Exception("Incorrect userid or password", e);
+        }
+        //  If we reached this far, we can ask the JwtUtils to provide us the token
+        final UserDetails userDetails = appUserDetailService
+                .loadUserByUsername(user.getUsername());
+
+        final String jwt = jwtUtils.generateToken(userDetails);
+
+        System.out.println("User token: "+jwt);
+
+        return ResponseEntity.ok(new TokenResponse(jwt));
+    }
+
+    @GetMapping(path = APIConstants.User.USER_CONFIG)
+    public ResponseEntity getUserConfigs(){
+        try {
+            return this.userService.getUserConfigurations();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     /**

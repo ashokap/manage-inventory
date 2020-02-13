@@ -1,5 +1,6 @@
 package com.example.manageinventory.services;
 
+import com.example.manageinventory.authentication.AuthenticationService;
 import com.example.manageinventory.constants.InventoryConstants;
 import com.example.manageinventory.models.*;
 import com.example.manageinventory.repositories.*;
@@ -31,6 +32,9 @@ public class IndentService implements InitializingBean {
     private IndentLineRepository indentLineRepository;
     @Autowired
     private LocationService locationService;
+    @Autowired
+    private AuthenticationService authenticationService;
+
 
     public static Map<String, String> validationErrorObj =  new HashMap<>();
 
@@ -82,6 +86,9 @@ public class IndentService implements InitializingBean {
         indent.setDeliveryDate(deliveryDate);
         indent.setType(indentViewModel.getType());
         indent.setRemarks(indentViewModel.getRemarks());
+        //Check and add raisedBy user
+        User raisedBy = authenticationService.getLoggedInUserObject();
+        indent.setRaisedBy(raisedBy);
         //Set status based on type
         if(indent.getType() == IndentType.INCOMING){
             indent.setStatus(IndentStatus.ORDER_PLACED);
@@ -257,6 +264,12 @@ public class IndentService implements InitializingBean {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Parent Indent with ID: %d not found",id));
         }
         ReturnIndent returnIndent = new ReturnIndent();
+
+        //Validate multiple returns for this parent indent so that cumulative of all returns shouldn't exceed parent indetn's quantitt for each product
+        if(!validatePreviousReturnIndentLines(indent, returnIndentViewModel.getIndentLineList())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationErrorObj);
+        }
+
         //If indent type is incoming, then create return of type incoming
         if(indent.getType() == IndentType.INCOMING){
             returnIndent.setType(ReturnIndentType.RETURN_INCOMING);
@@ -265,59 +278,43 @@ public class IndentService implements InitializingBean {
             returnIndent.setType(ReturnIndentType.RETURN_OUTGOING);
             returnIndent.setStatus(ReturnIndentStatus.OUTGOING_RETURN_CREATED);
         }
+        //All fine, now create the return indent, also credit/debit products in the inventory
+        returnIndent.setIndent(indent);
+        returnIndent.setReturnDate(new Date());
+        returnIndent.setRemarks(returnIndentViewModel.getRemarks());
+
+        returnIndentRepository.saveAndFlush(returnIndent);
+
 
         //Check the product list and quantities and make sure no other products or quantity exceeding the original indent are being returned
         if(returnIndentViewModel.getIndentLineList() == null || returnIndentViewModel.getIndentLineList().size() <= 0){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Return Indent Line should atleast contain 1 product from the original indent."));
         }else{
-            Set<IndentLine> parentIndentLineList = indent.getIndentLineList();
-            //TODO> since indent.getIndentLines is not returning all the child lines, getting the indentlines directly from db.
-            // To be investigated further
-            if(parentIndentLineList.size() == 0){
-                parentIndentLineList = indentLineRepository.getAllIndentLinesForIndent(indent.getId());
-            }
-
+            //Iterate through each incoming indent view lines and prepare return indent line
             Set<IndentLine> returnIndentLines = new HashSet<>();
             //Go through each incoming indentline and cross check with existing indent's indentlines and
             // return error if any of the product gets mismatched
             for(IndentLineViewModel returnIndentLineViewModel: returnIndentViewModel.getIndentLineList()){
-                IndentLine indentLineFound = new IndentLine();
-                //Go through each of the indent's indentlines and see if the product is present or not
-                for(IndentLine parentIndentLine: parentIndentLineList){
-                    if(parentIndentLine.getProduct().getId() == returnIndentLineViewModel.getProduct_id()){
-                        indentLineFound = parentIndentLine;
-                        break;
-                    }
-                }
-                //If no such indent line found, return error
-                if (indentLineFound.getProduct() == null){
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Product ID %d not found within the original indent %d ",returnIndentLineViewModel.getProduct_id(), indent.getId()));
-                }
-                //If relevant product found, make sure that the quantity is <= original quantity
-                if(indentLineFound.getQuantity() < returnIndentLineViewModel.getQuantity()){
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("You can only return %d items for the product %d ",indentLineFound.getQuantity(), indentLineFound.getProduct().getId() ));
-                }
-                //If relevant product found, make sure that the price is unchanged
-                if(indentLineFound.getUnitPrice() != returnIndentLineViewModel.getUnitPrice()){
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Price mismatch while returning product %d. Original price: %d, New Price: %d ",indentLineFound.getProduct().getId(), indentLineFound.getUnitPrice(), returnIndentLineViewModel.getUnitPrice() ));
-                }
-                //All fine. Assign the quantity and price from return indent view model and assign the line to return indent
-                indentLineFound.setQuantity(returnIndentLineViewModel.getQuantity());
-                indentLineFound.setUnitPrice(returnIndentLineViewModel.getUnitPrice());
-                indentLineFound.setReturnIndent(returnIndent);
-                returnIndentLines.add(indentLineFound);
+
+                //All fine. Create and Assign a new IndentLine the quantity and price from return indent view model and assign the line to return indent
+                IndentLine newIndentLine = new IndentLine();
+                newIndentLine.setQuantity(returnIndentLineViewModel.getQuantity());
+                newIndentLine.setUnitPrice(returnIndentLineViewModel.getUnitPrice());
+                newIndentLine.setReturnIndent(returnIndent);
+                newIndentLine.setProduct(productRepository.findProductById(returnIndentLineViewModel.getProduct_id()));
+
+                returnIndentLines.add(newIndentLine);
             }
 
-            //All fine, now create the return indent, also credit/debit products in the inventory
-            returnIndent.setIndent(indent);
+            //Save return indent line items
+            indentLineRepository.saveAll(returnIndentLines);
             //Add all the return indent lines prepared above
             returnIndent.setIndentLineList(returnIndentLines);
-            returnIndent.setReturnDate(new Date());
-            returnIndent.setRemarks(returnIndentViewModel.getRemarks());
             //Save the return indent
             returnIndentRepository.saveAndFlush(returnIndent);
 
-            //Now update product's quantity based on the retuned line items
+
+            //Now update product's quantity based on the returned line items
             for(IndentLine returnIndentLine: returnIndent.getIndentLineList()){
                 Product product = returnIndentLine.getProduct();
 
@@ -330,11 +327,108 @@ public class IndentService implements InitializingBean {
                 this.productRepository.saveAndFlush(product);
             }
 
-            //Save return indent line items
-            indentLineRepository.saveAll(returnIndentLines);
             return ResponseEntity.status(HttpStatus.CREATED).body(mapToReturnIndentView(returnIndent));
         }
 
+    }
+
+    private boolean validatePreviousReturnIndentLines(Indent indent, Set<IndentLineViewModel> returnIndentViewModels) {
+        Set<IndentLine> parentIndentLineList = indent.getIndentLineList();
+        //TODO> since indent.getIndentLines is not returning all the child lines, getting the indentlines directly from db.
+        // To be investigated further
+        if(parentIndentLineList.size() == 0){
+            parentIndentLineList = indentLineRepository.getAllIndentLinesForIndent(indent.getId());
+        }
+        Map<Integer, Integer> masterProductQuantityMapParentIndent = new HashMap<>();
+        for(IndentLine parentIndentLine: parentIndentLineList) {
+            //Check and populate map data for each product type
+            if (masterProductQuantityMapParentIndent.get(parentIndentLine.getProduct().getId()) == null) {
+                masterProductQuantityMapParentIndent.put(parentIndentLine.getProduct().getId(), parentIndentLine.getQuantity());
+            } else {
+                Integer currentQuantity = masterProductQuantityMapParentIndent.get(parentIndentLine.getProduct().getId());
+                masterProductQuantityMapParentIndent.put(parentIndentLine.getProduct().getId(), currentQuantity + parentIndentLine.getQuantity());
+            }
+        }
+
+
+        //Check if there is any issue with the product list
+        for(IndentLineViewModel returnIndentLineViewModel: returnIndentViewModels){
+            IndentLine parentIndentLineFound = new IndentLine();
+            //Go through each of the indent's indentlines and see if the product is present or not
+            for(IndentLine parentIndentLine: parentIndentLineList){
+
+                if(parentIndentLine.getProduct().getId() == returnIndentLineViewModel.getProduct_id()){
+                    parentIndentLineFound = parentIndentLine;
+                    break;
+                }
+            }
+            //If no such indent line found, return error
+            if (parentIndentLineFound.getProduct() == null){
+                //return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Product ID %d not found within the original indent %d ",returnIndentLineViewModel.getProduct_id(), indent.getId()));
+                setValidationErrorObject("ValidationError", String.format("Product ID %d not found within the original indent %d ",returnIndentLineViewModel.getProduct_id(), indent.getId()), "ReturnIndent", "IndentLine");
+                return false;
+            }
+            //If quantity is <=0 return error
+            if( returnIndentLineViewModel.getQuantity() <= 0){
+                setValidationErrorObject("ValidationError", String.format("Please specify atleast 1 quantity of product %d", parentIndentLineFound.getProduct().getId()), "ReturnIndent", "IndentLine");
+                return false;
+            }
+            //If relevant product found, make sure that the quantity is <= original quantity
+            if(parentIndentLineFound.getQuantity() < returnIndentLineViewModel.getQuantity()){
+                //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("You can only return %d items for the product %d ",parentIndentLineFound.getQuantity(), parentIndentLineFound.getProduct().getId() ));
+                setValidationErrorObject("ValidationError", String.format("You can only return %d items for the product %d ",parentIndentLineFound.getQuantity(), parentIndentLineFound.getProduct().getId()), "ReturnIndent", "IndentLine");
+                return false;
+            }
+            //If relevant product found, make sure that the price is unchanged
+            if(parentIndentLineFound.getUnitPrice() != returnIndentLineViewModel.getUnitPrice()){
+                //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(String.format("Price mismatch while returning product %d. Original price: %d, New Price: %d ",parentIndentLineFound.getProduct().getId(), parentIndentLineFound.getUnitPrice(), returnIndentLineViewModel.getUnitPrice() ));
+                setValidationErrorObject("ValidationError", String.format("Price mismatch while returning product %d. Original price: %f, New Price: %f ",parentIndentLineFound.getProduct().getId(), parentIndentLineFound.getUnitPrice(), returnIndentLineViewModel.getUnitPrice()), "ReturnIndent", "IndentLine");
+                return false;
+            }
+
+        }
+
+
+        //Get all previous return Indents
+        Set<ReturnIndent> returnIndents = returnIndentRepository.getAllReturnIndentsForIndent(indent.getId());
+        //Prepare a master list of all indent lines for each product type
+        Map<Integer, Integer> masterProductQuantityMapReturnIndent = new HashMap<>();
+
+        for(ReturnIndent returnIndent: returnIndents){
+            //TODO Getting indentlines explicitly
+            //For each return indent's indeline line add relevant info into master indent line(each object represents a unique product
+            Set<IndentLine> returnIndentLines = indentLineRepository.getAllIndentLinesForReturnIndent(returnIndent.getId());
+            for(IndentLine returnIndentLine: returnIndentLines){
+                //Check and populate map data for each product type
+                if(masterProductQuantityMapReturnIndent.get(returnIndentLine.getProduct().getId()) == null){
+                    masterProductQuantityMapReturnIndent.put(returnIndentLine.getProduct().getId(), returnIndentLine.getQuantity());
+                }else{
+                    Integer currentQuantity = masterProductQuantityMapReturnIndent.get(returnIndentLine.getProduct().getId());
+                    masterProductQuantityMapReturnIndent.put(returnIndentLine.getProduct().getId(), currentQuantity+returnIndentLine.getQuantity());
+                }
+            }
+        }
+
+        //Get all the indent lines from parent indent
+        Set<IndentLine> parentIndentLines = indentLineRepository.getAllIndentLinesForIndent(indent.getId());
+        //Check if for any of the products mentioned, total quantity from all previous returns exceeds original quantity. If fo return false along with error
+        System.out.println("\n Master Product Map PArent Indent: "+masterProductQuantityMapParentIndent);
+        System.out.println("\n Master Product Map All Return Indents: "+masterProductQuantityMapReturnIndent);
+        if(masterProductQuantityMapReturnIndent.size() > 0) {
+            for(IndentLineViewModel returnIndentLineViewModel: returnIndentViewModels){
+                int parentProductQuantity = masterProductQuantityMapParentIndent.get(returnIndentLineViewModel.getProduct_id());
+                int returnIndentTotalProductQuantity = masterProductQuantityMapReturnIndent.get(returnIndentLineViewModel.getProduct_id());
+                int currentQuantity = returnIndentLineViewModel.getQuantity();
+
+                if(returnIndentTotalProductQuantity + currentQuantity > parentProductQuantity ){
+                    setValidationErrorObject("ValidationError", String.format("You have already returned %d units of Product %d. You can further return %d units only",
+                            returnIndentTotalProductQuantity,returnIndentLineViewModel.getProduct_id(),parentProductQuantity - returnIndentTotalProductQuantity ),
+                            "ReturnIndent", "IndentLine");
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private void setValidationErrorObject(String errorType, String message, String object,  String field){
@@ -368,8 +462,9 @@ public class IndentService implements InitializingBean {
         indentViewModel.setDeliveryDate(indent.getDeliveryDate().toString());
         indentViewModel.setId(indent.getId());
         indentViewModel.setLocation_id(indent.getLocation().getId());
+        indentViewModel.setRaisedBy(indent.getRaisedBy().getDisplayName());
         if(indent.getRaisedBy() != null){
-            indentViewModel.setRaisedBy(indent.getRaisedBy().getId());
+            indentViewModel.setRaisedBy(indent.getRaisedBy().getDisplayName());
         }
 
         indentViewModel.setRemarks(indent.getRemarks());
@@ -414,16 +509,29 @@ public class IndentService implements InitializingBean {
         //Map indent line items
         Set<IndentLineViewModel> indentLineViewModelSet = new HashSet<>();
         Set<IndentLine> indentLines = returnIndent.getIndentLineList();
-//        //TODO: Getting indentlines from indent is not working automatically. Hence as a temp fix, getting the indent lines explicitly
-//        if (indentLines.size() == 0){
-//            indentLines = indentLineRepository.getAllIndentLinesForIndent(indent.getId());
-//        }
+        //TODO: Getting indentlines from indent is not working automatically. Hence as a temp fix, getting the indent lines explicitly
+        if (indentLines.size() == 0){
+            indentLines = indentLineRepository.getAllIndentLinesForReturnIndent(returnIndent.getId());
+        }
 
+        System.out.println("\n Indent lines for return indent: "+indentLineRepository.getAllIndentLinesForReturnIndent(returnIndent.getId()));
         for(IndentLine indentLine: indentLines){
             IndentLineViewModel indentLineViewModel = mapToIndentLineViewModel(indentLine);
             indentLineViewModelSet.add(indentLineViewModel);
         }
         returnIndentViewModel.setIndentLineList(indentLineViewModelSet);
         return returnIndentViewModel;
+    }
+
+    public ResponseEntity getIndentConfigurations() {
+        //Return a Hash with all the relevant Static/Config data related to indents, indentlines, return indents
+        Map<String, Object> indentConfig = new HashMap<>();
+
+        indentConfig.put("IndentType", IndentType.values());
+        indentConfig.put("IndentStatus", IndentStatus.values());
+        indentConfig.put("ReturnIndentType", ReturnIndentType.values());
+        indentConfig.put("ReturnIndentStatus", ReturnIndentStatus.values());
+
+        return ResponseEntity.status(HttpStatus.OK).body(indentConfig);
     }
 }

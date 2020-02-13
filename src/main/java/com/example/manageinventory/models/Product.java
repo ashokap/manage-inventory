@@ -12,8 +12,7 @@ import java.util.Set;
 /**
  * Created by pana on 24/01/20.
  */
-@Entity
-@Table(name = "product")
+@Entity(name = "product")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

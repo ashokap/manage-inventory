@@ -20,6 +20,8 @@ public class APIConstants {
         public static final String PRODUCT_FAST_MOVING = "/fastmoving";
         public static final String PRODUCT_SLOW_MOVING = "/slowmoving";
         public static final String PRODUCT_CRITICAL_STOCK = "/criticalstock";
+        public static final String PRODUCT_SPECIFIC_STOCK = "/specificstock";
+        public static final String PRODUCT_CONFIG = "/config";
     }
 
     public class Location {
@@ -36,6 +38,7 @@ public class APIConstants {
         public static final String INDENT_GET_UPDATE_DELETE = "/{id}";
         public static final String INDENT_LOCATIONS = "{id}/locations";
         public static final String INDENT_RETURN_CREATE = "{id}/returns";
+        public static final String INDENT_CONFIG = "/config";
 
     }
 
@@ -44,6 +47,7 @@ public class APIConstants {
         public static final String USER_GET_UPDATE_DELETE = "/{id}";
         public static final String USER_RESET_PASSWORD = "/reset";
         public static final String USER_LOGIN = "/login";
+        public static final String USER_CONFIG = "/config";
     }
 
     public class Manufacturer {

@@ -67,6 +67,13 @@ public class LocationController {
 
     }
 
+    /**
+     * Update location details
+     * @param locationViewModel
+     * @param id
+     * @return
+     */
+
     @PutMapping(path = APIConstants.Location.LOCATION_GET_UPDATE_DELETE)
     public ResponseEntity updateLocation(@RequestBody final LocationViewModel locationViewModel,
                                         @PathVariable int id) {
@@ -93,22 +100,47 @@ public class LocationController {
         }
     }
 
+    /**
+     * Get products residing within a given location
+     * @return
+     */
     @GetMapping(path = APIConstants.Location.LOCATION_PRODUCTS)
-    public ResponseEntity getAllProductsForLocation(){
-        return null;
+    public ResponseEntity getAllProductsForLocation(@PathVariable int id){
+        try{
+            return this.locationService.getProductsForLocation(id);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
+    /**
+     * Get Indents residing within a given location
+     * @return
+     */
     @GetMapping(path = APIConstants.Location.LOCATION_INDENTS)
     public ResponseEntity getAllIndentsForLocation(){
         return null;
     }
 
+    /**
+     * Place products into a new location
+     * @param productId
+     * @param quantity
+     * @return
+     */
 
     @PostMapping(path = APIConstants.Location.LOCATION_PLACE_PRODUCTS)
     public ResponseEntity placeProductsInLocation(@RequestParam int productId, @RequestParam int quantity){
         return null;
     }
 
+    /**
+     * TODO
+     * Remove products from a location
+     * @param productId
+     * @param quantity
+     * @return
+     */
 
     @PostMapping(path = APIConstants.Location.LOCATION_REMOVE_PRODUCTS)
     public ResponseEntity removeProductsFromLocation(@RequestParam int productId, @RequestParam int quantity){

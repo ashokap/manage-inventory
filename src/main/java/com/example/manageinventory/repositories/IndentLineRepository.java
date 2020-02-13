@@ -16,4 +16,8 @@ public interface IndentLineRepository extends JpaRepository<IndentLine, Integer>
     @Query("SELECT il from indent_line il where il.indent.id = ?1")
     Set<IndentLine> getAllIndentLinesForIndent(int indentId);
 
+    //Get list of all indent lines for a given return indent
+    @Query("SELECT il from indent_line il where il.returnIndent.id = ?1")
+    Set<IndentLine> getAllIndentLinesForReturnIndent(int returnIndent_id);
+
 }

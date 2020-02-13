@@ -16,11 +16,11 @@ public class Vendor {
     @Column(name = "address3")
     private String address3;
     @Column(name = "type")
-    private Enum<VendorType> type;
+    private VendorType type;
     @Column(name = "gst_number")
     private String gstNumber;
 
-    public Vendor(String name, String address1, String address2, String address3, Enum<VendorType> type, String gstNumber) {
+    public Vendor(String name, String address1, String address2, String address3, VendorType type, String gstNumber) {
         this.name = name;
         this.address1 = address1;
         this.address2 = address2;
@@ -69,11 +69,11 @@ public class Vendor {
         this.address3 = address3;
     }
 
-    public Enum<VendorType> getType() {
+    public VendorType getType() {
         return type;
     }
 
-    public void setType(Enum<VendorType> type) {
+    public void setType(VendorType type) {
         this.type = type;
     }
 

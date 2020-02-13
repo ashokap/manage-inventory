@@ -25,6 +25,9 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthRequestFilter authRequestFilter;
 
+    @Autowired
+    private FilterExceptionCatcher filterExceptionCatcher;
+
     //  Use the overload for configure where we return a static user
 
     @Override
@@ -66,5 +69,6 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
         //  AuthRequestFilter must be processed before the default UsernamePasswordAuthenticationFilter
         httpSecurity.addFilterBefore(authRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(filterExceptionCatcher, AuthRequestFilter.class);
     }
 }

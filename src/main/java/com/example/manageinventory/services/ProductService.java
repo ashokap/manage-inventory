@@ -1,5 +1,6 @@
 package com.example.manageinventory.services;
 
+import com.example.manageinventory.constants.InventoryConstants;
 import com.example.manageinventory.models.*;
 import com.example.manageinventory.repositories.ManufacturerRepository;
 import com.example.manageinventory.repositories.ProductRepository;
@@ -13,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ProductService implements InitializingBean {
@@ -178,4 +176,30 @@ public class ProductService implements InitializingBean {
         return productViewModel;
     }
 
+    public ResponseEntity getProductConfigurations() {
+        //Return a Hash with all the relevant Static/Config data related to users
+        Map<String, Object> productConfig = new HashMap<>();
+
+        productConfig.put("ProductCategory", ProductCategory.values());
+        productConfig.put("ProductStatus", ProductStatus.values());
+        return ResponseEntity.status(HttpStatus.OK).body(productConfig);
+    }
+
+    public ResponseEntity getListOfProductsWithLowStock() {
+        List<Product> lowStockProducts = productRepository.getLowStockProducts(InventoryConstants.ProductConstants.CRITICALLY_LOW_STOCK);
+        List<ProductViewModel> productViewModels = new ArrayList<>();
+        for(Product product: lowStockProducts){
+            productViewModels.add(mapToProductViewModel(product));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(productViewModels);
+    }
+
+    public ResponseEntity getListOfProductsWithSpecificStock(int quantity) {
+        List<Product> lowStockProducts = productRepository.getLowStockProducts(quantity);
+        List<ProductViewModel> productViewModels = new ArrayList<>();
+        for(Product product: lowStockProducts){
+            productViewModels.add(mapToProductViewModel(product));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(productViewModels);
+    }
 }

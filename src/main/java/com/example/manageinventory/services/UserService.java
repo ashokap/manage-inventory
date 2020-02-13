@@ -1,8 +1,6 @@
 package com.example.manageinventory.services;
 
-import com.example.manageinventory.models.Product;
-import com.example.manageinventory.models.ProductStatus;
-import com.example.manageinventory.models.User;
+import com.example.manageinventory.models.*;
 import com.example.manageinventory.repositories.UserRepository;
 import com.example.manageinventory.view_models.UserViewModel;
 import org.springframework.beans.BeanUtils;
@@ -10,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -77,5 +78,14 @@ public class UserService {
         userViewModel.setUserCode(user.getUserCode());
         userViewModel.setType(user.getType());
         return userViewModel;
+    }
+
+    public ResponseEntity getUserConfigurations() {
+        //Return a Hash with all the relevant Static/Config data related to users
+        Map<String, Object> userConfig = new HashMap<>();
+
+        userConfig.put("UserType", UserType.values());
+        userConfig.put("VendorType", VendorType.values());
+        return ResponseEntity.status(HttpStatus.OK).body(userConfig);
     }
 }

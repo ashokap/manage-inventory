@@ -23,7 +23,7 @@ public class IndentViewModel {
 
     private String deliveryDate;
 
-    private int raisedBy;
+    private String raisedBy;
 
     private double totalPrice;
 
@@ -61,11 +61,11 @@ public class IndentViewModel {
         this.deliveryDate = deliveryDate;
     }
 
-    public int getRaisedBy() {
+    public String getRaisedBy() {
         return raisedBy;
     }
 
-    public void setRaisedBy(int raisedBy) {
+    public void setRaisedBy(String raisedBy) {
         this.raisedBy = raisedBy;
     }
 

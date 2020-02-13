@@ -71,6 +71,13 @@ public class ProductController {
 
     }
 
+    /**
+     * Update Product Details
+     * @param product
+     * @param id
+     * @return
+     */
+
     @PutMapping(path = APIConstants.Product.PRODUCT_GET_UPDATE_DELETE)
     public ResponseEntity updateProduct(@RequestBody final ProductViewModel product,
                                         @PathVariable int id) {
@@ -97,6 +104,11 @@ public class ProductController {
         }
     }
 
+    /**
+     * Get all the locations for a given product
+     * @param id
+     * @return
+     */
     //Get details of a product
     @GetMapping(path = APIConstants.Product.PRODUCT_LOCATIONS)
     public ResponseEntity getLocationsForProduct(
@@ -108,15 +120,38 @@ public class ProductController {
         }
     }
 
-    //Get details of a product
+    /**
+     * //Get all products who's quanity <= a predefined low stock
+     * @return
+     */
     @GetMapping(path = APIConstants.Product.PRODUCT_CRITICAL_STOCK)
     public ResponseEntity getCriticallyLowProducts() {
         try {
-            return null;
+            return this.productService.getListOfProductsWithLowStock();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    /**
+     * //Get all products who's quanity <= a user defined quantity
+     * @return
+     */
+    @GetMapping(path = APIConstants.Product.PRODUCT_SPECIFIC_STOCK)
+    public ResponseEntity getProductsWithSpecificStock(@RequestParam int quantity) {
+        try {
+            return this.productService.getListOfProductsWithSpecificStock(quantity);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    /**
+     * TODO
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
 
     @GetMapping(path = APIConstants.Product.PRODUCT_FAST_MOVING)
     public ResponseEntity getFastMovingProducts(
@@ -128,11 +163,31 @@ public class ProductController {
         }
     }
 
+    /**
+     * TODO
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+
     @GetMapping(path = APIConstants.Product.PRODUCT_SLOW_MOVING)
     public ResponseEntity getSlowMovingProducts(
             @RequestParam String fromDate, @RequestParam String toDate) {
         try {
             return null;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Get all the static data required to manage product
+     * @return
+     */
+    @GetMapping(path = APIConstants.Product.PRODUCT_CONFIG)
+    public ResponseEntity getProductConfigs(){
+        try {
+            return this.productService.getProductConfigurations();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

@@ -2,6 +2,8 @@ package com.example.manageinventory.authentication;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -44,16 +46,16 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf()
-                .disable()
+                .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/1/ims/users/login", "/api/1/ims/users/reset",
-                        "/v2/api-docs",
-                        "/configuration/ui",
+                .antMatchers("/v2/api-docs",
                         "/swagger-resources/**",
-                        "/configuration/security",
                         "/swagger-ui.html",
-                        "/webjars/**")
+                        "/configuration/ui",
+                        "/configuration/security",
+                        "/webjars/**",
+                        "/api/1/ims/users/login",
+                        "/api/1/ims/users/reset")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

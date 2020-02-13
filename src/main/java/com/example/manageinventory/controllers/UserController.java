@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping(path = APIConstants.User.USER_ROOT)
 public class UserController {
     @Autowired
@@ -54,6 +54,7 @@ public class UserController {
     @PostMapping(path = APIConstants.User.USER_LOGIN)
     public ResponseEntity loginUser(@RequestBody LoginUserViewModel user) throws Exception {
         try {
+            System.out.println(userService.getUserByEmail("ashoka.p@gmail.com"));
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
             );

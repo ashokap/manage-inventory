@@ -277,9 +277,7 @@ public class IndentService implements InitializingBean {
                 parentIndentLineList = indentLineRepository.getAllIndentLinesForIndent(indent.getId());
             }
 
-            System.out.println(indent.getIndentLineList());
-            System.out.println("\n HERE \n");
-            List<IndentLine> returnIndentLines = new ArrayList<>();
+            Set<IndentLine> returnIndentLines = new HashSet<>();
             //Go through each incoming indentline and cross check with existing indent's indentlines and
             // return error if any of the product gets mismatched
             for(IndentLineViewModel returnIndentLineViewModel: returnIndentViewModel.getIndentLineList()){
@@ -334,7 +332,7 @@ public class IndentService implements InitializingBean {
 
             //Save return indent line items
             indentLineRepository.saveAll(returnIndentLines);
-            return ResponseEntity.status(HttpStatus.CREATED).body(returnIndent);
+            return ResponseEntity.status(HttpStatus.CREATED).body(mapToReturnIndentView(returnIndent));
         }
 
     }
@@ -353,7 +351,15 @@ public class IndentService implements InitializingBean {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Indent with ID: %d not found",id));
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(indent.getIndentLineList());
+        Set<IndentLineViewModel> indentLineViewModels = new HashSet<>();
+        Set<IndentLine> indentLines = indent.getIndentLineList();
+        if(indentLines.size() == 0){
+            indentLines = indentLineRepository.getAllIndentLinesForIndent(indent.getId());
+        }
+        for(IndentLine indentLine: indentLines){
+            indentLineViewModels.add(mapToIndentLineViewModel(indentLine));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(indentLineViewModels);
     }
 
     public IndentViewModel mapToIndentViewModel(Indent indent){
@@ -394,5 +400,30 @@ public class IndentService implements InitializingBean {
         indentLineViewModel.setUnitPrice(indentLine.getUnitPrice());
 
         return indentLineViewModel;
+    }
+
+    public ReturnIndentViewModel mapToReturnIndentView(ReturnIndent returnIndent){
+        ReturnIndentViewModel returnIndentViewModel = new ReturnIndentViewModel();
+        returnIndentViewModel.setType(returnIndent.getType().toString());
+        returnIndentViewModel.setReturnDate(returnIndent.getReturnDate().toString());
+        returnIndentViewModel.setId(returnIndent.getId());
+        returnIndentViewModel.setRemarks(returnIndent.getRemarks());
+
+        returnIndentViewModel.setStatus(returnIndent.getStatus());
+
+        //Map indent line items
+        Set<IndentLineViewModel> indentLineViewModelSet = new HashSet<>();
+        Set<IndentLine> indentLines = returnIndent.getIndentLineList();
+//        //TODO: Getting indentlines from indent is not working automatically. Hence as a temp fix, getting the indent lines explicitly
+//        if (indentLines.size() == 0){
+//            indentLines = indentLineRepository.getAllIndentLinesForIndent(indent.getId());
+//        }
+
+        for(IndentLine indentLine: indentLines){
+            IndentLineViewModel indentLineViewModel = mapToIndentLineViewModel(indentLine);
+            indentLineViewModelSet.add(indentLineViewModel);
+        }
+        returnIndentViewModel.setIndentLineList(indentLineViewModelSet);
+        return returnIndentViewModel;
     }
 }

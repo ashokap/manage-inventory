@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by pana on 24/01/20.
@@ -27,7 +28,7 @@ public class ReturnIndent {
     private Indent indent;
 
     @OneToMany(mappedBy = "returnIndent")
-    List<IndentLine> indentLineList = new ArrayList<>();
+    Set<IndentLine> indentLineList = new HashSet<>();
 
     @Column(name = "return_date")
     private Date returnDate;
@@ -83,11 +84,11 @@ public class ReturnIndent {
         this.returnDate = returnDate;
     }
 
-    public List<IndentLine> getIndentLineList() {
+    public Set<IndentLine> getIndentLineList() {
         return indentLineList;
     }
 
-    public void setIndentLineList(List<IndentLine> indentLineList) {
+    public void setIndentLineList(Set<IndentLine> indentLineList) {
         this.indentLineList = indentLineList;
     }
 

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RequestMapping(path = APIConstants.Indent.INDENT_ROOT)
 public class IndentController {
 
@@ -137,6 +137,20 @@ public class IndentController {
     public ResponseEntity createReturnForIndent(@PathVariable int id, @RequestBody ReturnIndentViewModel returnIndentViewModel){
         try{
             return this.indentService.createReturnForIndent(id, returnIndentViewModel);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Get list of all returns for the given indent
+     * @param id
+     * @return
+     */
+    @GetMapping(path = APIConstants.Indent.INDENT_RETURN_CREATE)
+    public ResponseEntity getReturnIndentsForIndent(@PathVariable int id){
+        try{
+            return this.indentService.getReturnIndentsForIndent(id);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

@@ -24,7 +24,7 @@ public class Indent {
     @Column(name = "status")
     private IndentStatus status;
 
-    @OneToMany(mappedBy = "indent")
+    @OneToMany(mappedBy = "indent", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     Set<IndentLine> indentLineList = new HashSet<>();
 

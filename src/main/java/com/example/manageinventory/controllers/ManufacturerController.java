@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RequestMapping(path = APIConstants.Manufacturer.MANUFACTURER_ROOT)
 public class ManufacturerController {
     @Autowired

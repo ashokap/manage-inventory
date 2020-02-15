@@ -27,7 +27,7 @@ public class ReturnIndent {
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     private Indent indent;
 
-    @OneToMany(mappedBy = "returnIndent")
+    @OneToMany(mappedBy = "returnIndent", cascade = CascadeType.ALL)
     Set<IndentLine> indentLineList = new HashSet<>();
 
     @Column(name = "return_date")
@@ -90,6 +90,15 @@ public class ReturnIndent {
 
     public void setIndentLineList(Set<IndentLine> indentLineList) {
         this.indentLineList = indentLineList;
+    }
+
+    public void addIndentLine(IndentLine indentLine){
+        System.out.println("Current IndentList: "+indentLineList);
+        if(indentLineList == null){
+            indentLineList = new HashSet<>();
+        }
+        indentLineList.add(indentLine);
+        indentLine.setReturnIndent(this);
     }
 
 

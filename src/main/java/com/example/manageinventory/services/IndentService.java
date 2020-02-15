@@ -96,12 +96,13 @@ public class IndentService implements InitializingBean {
             indent.setStatus(IndentStatus.ORDER_RECEIVED);
         }
 
-        //Save the indent so that we can create indent lines for the persisted indent record
-        indent = indentRepository.saveAndFlush(indent);
+
         //Validate and Set Indent Lines
         if (!validateIndentViewLines(indentViewModel.getIndentLineList(), indent)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationErrorObj);
         }
+        //Save the indent so that we can create indent lines for the persisted indent record
+        indent = indentRepository.saveAndFlush(indent);
         //Only when a valid location id is sent, proceed with location-product mapping
         if(indentViewModel.getLocation_id() > 0){
             if(!validateAndSetLocation(indentViewModel.getLocation_id(), indent, true)){
@@ -138,7 +139,7 @@ public class IndentService implements InitializingBean {
             indentLine.setProduct(registeredProduct);
             indentLine.setIndent(indent);
 
-            indentLine = indentLineRepository.saveAndFlush(indentLine);
+            //indentLine = indentLineRepository.saveAndFlush(indentLine);
             indent.addIndentLine(indentLine);
         }
         return true;
@@ -303,13 +304,15 @@ public class IndentService implements InitializingBean {
                 newIndentLine.setReturnIndent(returnIndent);
                 newIndentLine.setProduct(productRepository.findProductById(returnIndentLineViewModel.getProduct_id()));
 
-                returnIndentLines.add(newIndentLine);
+                //returnIndentLines.add(newIndentLine);
+                //Add new lines to return indent
+                returnIndent.addIndentLine(newIndentLine);
             }
 
             //Save return indent line items
-            indentLineRepository.saveAll(returnIndentLines);
+            //indentLineRepository.saveAll(returnIndentLines);
             //Add all the return indent lines prepared above
-            returnIndent.setIndentLineList(returnIndentLines);
+            //returnIndent.setIndentLineList(returnIndentLines);
             //Save the return indent
             returnIndentRepository.saveAndFlush(returnIndent);
 
@@ -533,5 +536,23 @@ public class IndentService implements InitializingBean {
         indentConfig.put("ReturnIndentStatus", ReturnIndentStatus.values());
 
         return ResponseEntity.status(HttpStatus.OK).body(indentConfig);
+    }
+
+    public ResponseEntity getReturnIndentsForIndent(int id) {
+        Indent parentIndent = indentRepository.findIndentById(id);
+        if(parentIndent == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Indent with ID: %d not found",id));
+        }
+
+        Set<ReturnIndent> returnIndents = returnIndentRepository.getAllReturnIndentsForIndent(id);
+
+        Set<ReturnIndentViewModel> returnIndentViewModels =  new HashSet<>();
+
+        for(ReturnIndent returnIndent: returnIndents){
+            returnIndentViewModels.add(mapToReturnIndentView(returnIndent));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(returnIndentViewModels);
+
     }
 }
